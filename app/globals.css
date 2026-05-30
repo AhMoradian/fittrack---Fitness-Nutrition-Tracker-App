@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --primary: 142 76% 36%;
+  --primary-foreground: 355 100% 100%;
+  --secondary: 215 25% 92%;
+  --muted: 210 40% 94%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 45 96% 58%;
+  --border: 214 32% 88%;
+  --ring: 142 76% 36%;
+}
+
+* { @apply border-border; }
+html { scroll-behavior: smooth; }
+body {
+  @apply bg-background text-foreground antialiased;
+  background:
+    radial-gradient(circle at top left, rgba(74, 222, 128, .25), transparent 30rem),
+    radial-gradient(circle at 80% 10%, rgba(250, 204, 21, .18), transparent 20rem),
+    hsl(var(--background));
+}
+
+.safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem); }
+.touch-card { @apply transition duration-200 active:scale-[0.98]; }
+.confetti-bg {
+  background-image: radial-gradient(#22c55e 1.2px, transparent 1.2px), radial-gradient(#facc15 1.2px, transparent 1.2px);
+  background-position: 0 0, 12px 12px;
+  background-size: 24px 24px;
+}
