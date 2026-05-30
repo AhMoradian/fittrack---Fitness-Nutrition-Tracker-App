@@ -131,14 +131,14 @@ npm install
 npm run dev
 ```
 
-Optional Supabase variables:
+Supabase environment variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-The UI can be viewed with sample data before connecting Supabase. Server actions currently document the write path and revalidation points; connecting them to Supabase RPCs is the next implementation step.
+When these variables are present and the user is authenticated, the app reads tasks and daily logs from Supabase and writes task progress through server actions. Without them, the UI falls back to the built-in home muscle-building sample plan so the app remains previewable.
 
 ## Database Setup
 

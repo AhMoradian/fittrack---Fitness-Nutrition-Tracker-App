@@ -32,6 +32,11 @@ create table public.tasks (
   category public.task_category not null,
   target_value numeric(10,2) not null check (target_value > 0),
   target_unit text not null,
+  description text,
+  guidance jsonb,
+  meal_time text,
+  set_targets jsonb,
+  ai_configurable boolean not null default true,
   xp_reward integer not null default 0 check (xp_reward >= 0),
   day_index smallint not null default 1 check (day_index between 1 and 7),
   sort_order integer not null default 0,
@@ -46,6 +51,7 @@ create table public.daily_logs (
   completed_value numeric(10,2) not null default 0 check (completed_value >= 0),
   completion_percentage numeric(5,2) not null default 0 check (completion_percentage between 0 and 100),
   notes text,
+  set_values jsonb,
   created_at timestamptz not null default now(),
   unique (task_id, date)
 );

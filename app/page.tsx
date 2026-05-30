@@ -4,7 +4,7 @@ import { ProgressRing } from '@/components/progress-ring';
 import { TaskCard } from '@/components/task-card';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { dailyLogs, getDailySummary, tasks } from '@/lib/sample-data';
+import { getProgramData } from '@/lib/data';
 import { xpIntoLevel } from '@/lib/utils';
 import type { TaskCategory } from '@/lib/types';
 
@@ -15,15 +15,15 @@ const sections: { key: TaskCategory; title: string; emoji: string; note: string 
   { key: 'habit', title: 'Habit Tasks', emoji: '✨', note: 'Small daily wins' },
 ];
 
-export default function TodayPage() {
-  const summary = getDailySummary();
-  const todayTasks = tasks.filter((task) => task.day_index === 1);
+export default async function TodayPage() {
+  const { tasks, dailyLogs, summary, source } = await getProgramData();
+  const todayTasks = tasks.filter((task) => task.day_index === 1 || task.category === 'nutrition' || task.category === 'recovery');
 
   return (
     <div>
-      <ScreenHeader eyebrow="Today" title="Win the day" subtitle="All fitness, nutrition, recovery, and habit behavior is tracked as one unified task model for future AI coaching." />
+      <ScreenHeader eyebrow="Today" title="Win the day" subtitle={`Home muscle-building tracker with Supabase ${source === 'supabase' ? 'live data' : 'sample fallback'}, set-by-set workout logs, and detailed nutrition counts.`} />
 
-      <section className="grid gap-4 px-5 md:grid-cols-[1.1fr_1fr] md:px-8">
+      <section className="grid gap-4 px-4 sm:px-5 md:grid-cols-[1.1fr_1fr] md:px-8">
         <Card className="confetti-bg overflow-hidden border-green-200 bg-green-50/90">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -66,7 +66,7 @@ export default function TodayPage() {
         </Card>
       </section>
 
-      <section className="mt-6 space-y-7 px-5 md:px-8">
+      <section className="mt-6 space-y-7 px-4 sm:px-5 md:px-8">
         {sections.map((section) => {
           const groupedTasks = todayTasks.filter((task) => task.category === section.key);
           return (
@@ -78,7 +78,7 @@ export default function TodayPage() {
                 </div>
                 <span className="text-xs font-black text-muted-foreground">{groupedTasks.length} tasks</span>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 lg:grid-cols-2">
                 {groupedTasks.map((task) => <TaskCard key={task.id} task={task} log={dailyLogs.find((log) => log.task_id === task.id)} />)}
               </div>
             </div>

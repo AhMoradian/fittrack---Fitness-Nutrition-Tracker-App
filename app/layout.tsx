@@ -18,8 +18,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body className="min-h-screen font-sans">
-        <main className="mx-auto min-h-screen max-w-md safe-bottom md:max-w-5xl">{children}</main>
         <BottomNav />
+        <main className="mx-auto min-h-screen w-full max-w-md safe-bottom md:max-w-6xl">{children}</main>
       </body>
     </html>
   );

@@ -8,6 +8,13 @@ export type Goal = {
   created_at: string;
 };
 
+export type TaskSetTarget = {
+  label: string;
+  target_value: number;
+  target_unit: string;
+  note?: string;
+};
+
 export type Task = {
   id: string;
   program_id: string;
@@ -19,6 +26,11 @@ export type Task = {
   sort_order: number;
   day_index: number;
   created_at: string;
+  description?: string;
+  guidance?: string[];
+  meal_time?: string;
+  set_targets?: TaskSetTarget[];
+  ai_configurable?: boolean;
 };
 
 export type DailyLog = {
@@ -28,6 +40,7 @@ export type DailyLog = {
   completed_value: number;
   completion_percentage: number;
   notes?: string;
+  set_values?: number[];
   created_at: string;
 };
 
