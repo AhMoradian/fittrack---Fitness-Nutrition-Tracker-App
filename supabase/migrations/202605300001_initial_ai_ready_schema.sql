@@ -1,185 +1,229 @@
--- FitTrack AI-ready unified task tracking schema.
--- Critical invariant: all trackable behavior is represented by tasks + daily_logs.
+-- Enable required extensions
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-create extension if not exists pgcrypto;
-
-create table public.goals (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  title text not null,
-  type text not null,
-  description text,
-  created_at timestamptz not null default now()
+-- Goals table
+CREATE TABLE goals (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  type TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, title)
 );
 
-create table public.weekly_programs (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  goal_id uuid references public.goals(id) on delete set null,
-  title text not null,
-  start_date date not null,
-  end_date date,
-  created_at timestamptz not null default now()
+-- Weekly programs
+CREATE TABLE weekly_programs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, name)
 );
 
-create type public.task_category as enum ('workout', 'nutrition', 'recovery', 'habit');
-
-create table public.tasks (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  program_id uuid references public.weekly_programs(id) on delete cascade,
-  title text not null,
-  category public.task_category not null,
-  target_value numeric(10,2) not null check (target_value > 0),
-  target_unit text not null,
-  description text,
-  guidance jsonb,
-  meal_time text,
-  set_targets jsonb,
-  ai_configurable boolean not null default true,
-  xp_reward integer not null default 0 check (xp_reward >= 0),
-  day_index smallint not null default 1 check (day_index between 1 and 7),
-  sort_order integer not null default 0,
-  created_at timestamptz not null default now()
+-- Tasks (unified task model)
+CREATE TABLE tasks (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  program_id UUID NOT NULL REFERENCES weekly_programs(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('workout', 'nutrition', 'recovery', 'habit')),
+  description TEXT,
+  target_value NUMERIC NOT NULL,
+  target_unit TEXT NOT NULL,
+  xp_reward INTEGER DEFAULT 10,
+  sort_order INTEGER NOT NULL,
+  day_index INTEGER NOT NULL CHECK (day_index >= 1 AND day_index <= 7),
+  meal_time TEXT,
+  guidance TEXT[],
+  set_targets JSONB,
+  ai_configurable BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-create table public.daily_logs (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  task_id uuid not null references public.tasks(id) on delete cascade,
-  date date not null,
-  completed_value numeric(10,2) not null default 0 check (completed_value >= 0),
-  completion_percentage numeric(5,2) not null default 0 check (completion_percentage between 0 and 100),
-  notes text,
-  set_values jsonb,
-  created_at timestamptz not null default now(),
-  unique (task_id, date)
+-- Daily logs (completion tracking)
+CREATE TABLE daily_logs (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  completed_value NUMERIC DEFAULT 0,
+  completion_percentage INTEGER DEFAULT 0 CHECK (completion_percentage >= 0 AND completion_percentage <= 100),
+  notes TEXT,
+  set_values NUMERIC[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, task_id, date)
 );
 
-create table public.body_metrics (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  date date not null,
-  weight numeric(6,2),
-  body_fat numeric(5,2),
-  waist numeric(6,2),
-  chest numeric(6,2),
-  arm numeric(6,2),
-  created_at timestamptz not null default now(),
-  unique (user_id, date)
+-- Body metrics (weight, measurements)
+CREATE TABLE body_metrics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  weight NUMERIC,
+  body_fat NUMERIC,
+  waist NUMERIC,
+  chest NUMERIC,
+  arm NUMERIC,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, date)
 );
 
-create table public.progress_photos (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  date date not null,
-  image_url text not null,
-  note text,
-  created_at timestamptz not null default now()
+-- Progress photos
+CREATE TABLE progress_photos (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  notes TEXT,
+  taken_at DATE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-create table public.user_stats (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null unique references auth.users(id) on delete cascade,
-  current_streak integer not null default 0,
-  best_streak integer not null default 0,
-  total_xp integer not null default 0,
-  current_level integer not null default 0,
-  created_at timestamptz not null default now()
+-- User stats (streak, XP, level)
+CREATE TABLE user_stats (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+  current_streak INTEGER DEFAULT 0,
+  best_streak INTEGER DEFAULT 0,
+  total_xp INTEGER DEFAULT 0,
+  current_level INTEGER DEFAULT 0,
+  last_active_date DATE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-create table public.streak_history (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  date date not null,
-  daily_completion numeric(5,2) not null check (daily_completion between 0 and 100),
-  successful boolean not null,
-  streak_after_day integer not null default 0,
-  created_at timestamptz not null default now(),
-  unique (user_id, date)
+-- Streak history
+CREATE TABLE streak_history (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  start_date DATE NOT NULL,
+  end_date DATE,
+  days_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-create table public.achievements (
-  id uuid primary key default gen_random_uuid(),
-  title text not null,
-  description text not null,
-  icon text not null,
-  xp_reward integer not null default 0 check (xp_reward >= 0),
-  condition_type text not null,
-  condition_value numeric(10,2) not null,
-  created_at timestamptz not null default now()
+-- Achievements (database-defined)
+CREATE TABLE achievements (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  icon TEXT,
+  xp_reward INTEGER DEFAULT 0,
+  condition_type TEXT NOT NULL,
+  condition_value INTEGER NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, title)
 );
 
-create table public.unlocked_achievements (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  achievement_id uuid not null references public.achievements(id) on delete cascade,
-  unlocked_at timestamptz not null default now(),
-  unique (user_id, achievement_id)
+-- Unlocked achievements
+CREATE TABLE unlocked_achievements (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  achievement_id UUID NOT NULL REFERENCES achievements(id) ON DELETE CASCADE,
+  unlocked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(user_id, achievement_id)
 );
 
-create index daily_logs_user_date_idx on public.daily_logs (user_id, date);
-create index daily_logs_task_date_idx on public.daily_logs (task_id, date);
-create index tasks_program_sort_idx on public.tasks (program_id, day_index, sort_order);
-create index achievements_condition_idx on public.achievements (condition_type, condition_value);
+-- User profile (settings, preferences)
+CREATE TABLE user_profiles (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL UNIQUE REFERENCES auth.users(id) ON DELETE CASCADE,
+  age NUMERIC,
+  height TEXT,
+  weight NUMERIC,
+  goal TEXT,
+  weekly_goal TEXT,
+  equipment TEXT[],
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-create or replace function public.set_daily_log_completion()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  task_target numeric(10,2);
-begin
-  select target_value into task_target from public.tasks where id = new.task_id;
-  if task_target is null or task_target <= 0 then
-    new.completion_percentage := 0;
-  else
-    new.completion_percentage := least(100, round((new.completed_value / task_target) * 100, 2));
-  end if;
-  return new;
-end;
-$$;
+-- Indexes for performance
+CREATE INDEX idx_tasks_user_program ON tasks(user_id, program_id);
+CREATE INDEX idx_tasks_category ON tasks(category);
+CREATE INDEX idx_daily_logs_user_date ON daily_logs(user_id, date);
+CREATE INDEX idx_daily_logs_task ON daily_logs(task_id);
+CREATE INDEX idx_body_metrics_user_date ON body_metrics(user_id, date);
+CREATE INDEX idx_streak_history_user ON streak_history(user_id);
+CREATE INDEX idx_achievements_user ON achievements(user_id);
+CREATE INDEX idx_unlocked_achievements_user ON unlocked_achievements(user_id);
 
-create trigger daily_logs_completion_before_write
-before insert or update of completed_value, task_id on public.daily_logs
-for each row execute function public.set_daily_log_completion();
+-- Row Level Security (RLS) Policies
+ALTER TABLE goals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE weekly_programs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE body_metrics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE progress_photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_stats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE streak_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE unlocked_achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
-create or replace function public.level_from_xp(total_xp integer)
-returns integer
-language sql
-immutable
-as $$ select floor(greatest(total_xp, 0) / 100)::integer; $$;
+-- Goals RLS
+CREATE POLICY "Users can read their own goals" ON goals FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own goals" ON goals FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own goals" ON goals FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own goals" ON goals FOR DELETE USING (auth.uid() = user_id);
 
-alter table public.goals enable row level security;
-alter table public.weekly_programs enable row level security;
-alter table public.tasks enable row level security;
-alter table public.daily_logs enable row level security;
-alter table public.body_metrics enable row level security;
-alter table public.progress_photos enable row level security;
-alter table public.user_stats enable row level security;
-alter table public.streak_history enable row level security;
-alter table public.achievements enable row level security;
-alter table public.unlocked_achievements enable row level security;
+-- Weekly programs RLS
+CREATE POLICY "Users can read their own programs" ON weekly_programs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own programs" ON weekly_programs FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own programs" ON weekly_programs FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own programs" ON weekly_programs FOR DELETE USING (auth.uid() = user_id);
 
-create policy "Users manage own goals" on public.goals for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own programs" on public.weekly_programs for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own tasks" on public.tasks for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own daily logs" on public.daily_logs for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own body metrics" on public.body_metrics for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own progress photos" on public.progress_photos for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own stats" on public.user_stats for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Users manage own streak history" on public.streak_history for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
-create policy "Achievement definitions are readable" on public.achievements for select using (true);
-create policy "Users read own unlocked achievements" on public.unlocked_achievements for select using (auth.uid() = user_id);
-create policy "Users insert own unlocked achievements" on public.unlocked_achievements for insert with check (auth.uid() = user_id);
+-- Tasks RLS
+CREATE POLICY "Users can read their own tasks" ON tasks FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own tasks" ON tasks FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own tasks" ON tasks FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own tasks" ON tasks FOR DELETE USING (auth.uid() = user_id);
 
-insert into public.achievements (title, description, icon, xp_reward, condition_type, condition_value) values
-  ('First Workout', 'Complete your first workout task.', '💪', 25, 'completed_workout_tasks', 1),
-  ('7 Day Streak', 'Maintain a successful day streak for one week.', '🔥', 100, 'streak_days', 7),
-  ('30 Day Streak', 'Maintain a successful day streak for thirty days.', '🏆', 300, 'streak_days', 30),
-  ('100 Completed Tasks', 'Complete one hundred tasks of any category.', '✅', 150, 'completed_tasks', 100),
-  ('First Weight Gain', 'Record your first weight increase toward your goal.', '📈', 50, 'weight_gain_kg', 1),
-  ('5kg Weight Gain', 'Gain five kilograms toward your goal.', '💚', 125, 'weight_gain_kg', 5),
-  ('1000 XP Earned', 'Earn one thousand total XP.', '⚡', 150, 'total_xp', 1000);
+-- Daily logs RLS
+CREATE POLICY "Users can read their own daily logs" ON daily_logs FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own daily logs" ON daily_logs FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own daily logs" ON daily_logs FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own daily logs" ON daily_logs FOR DELETE USING (auth.uid() = user_id);
+
+-- Body metrics RLS
+CREATE POLICY "Users can read their own metrics" ON body_metrics FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own metrics" ON body_metrics FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own metrics" ON body_metrics FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own metrics" ON body_metrics FOR DELETE USING (auth.uid() = user_id);
+
+-- Progress photos RLS
+CREATE POLICY "Users can read their own photos" ON progress_photos FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own photos" ON progress_photos FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own photos" ON progress_photos FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete their own photos" ON progress_photos FOR DELETE USING (auth.uid() = user_id);
+
+-- User stats RLS
+CREATE POLICY "Users can read their own stats" ON user_stats FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can update their own stats" ON user_stats FOR UPDATE USING (auth.uid() = user_id);
+
+-- Streak history RLS
+CREATE POLICY "Users can read their own streak history" ON streak_history FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own streak history" ON streak_history FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own streak history" ON streak_history FOR UPDATE USING (auth.uid() = user_id);
+
+-- Achievements RLS
+CREATE POLICY "Users can read their own achievements" ON achievements FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own achievements" ON achievements FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Unlocked achievements RLS
+CREATE POLICY "Users can read their unlocked achievements" ON unlocked_achievements FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert unlocked achievements" ON unlocked_achievements FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- User profiles RLS
+CREATE POLICY "Users can read their own profile" ON user_profiles FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert their own profile" ON user_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own profile" ON user_profiles FOR UPDATE USING (auth.uid() = user_id);
