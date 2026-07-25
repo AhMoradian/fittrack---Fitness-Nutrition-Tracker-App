@@ -3,7 +3,7 @@ import { getDailySummary, tasks, dailyLogs, bodyMetrics } from '@/lib/sample-dat
 import type { Task, DailyLog, UserStats, BodyMetric } from '@/lib/types';
 
 export async function getProgramData() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   // If no user, return sample data
@@ -109,7 +109,7 @@ export async function getProgramData() {
 }
 
 export async function getUserProfile() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) return null;

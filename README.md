@@ -1,149 +1,63 @@
-# FitTrack — AI-Ready Fitness & Nutrition Tracker
+# FitTrack — Personal Fitness Tracker
 
-FitTrack is a mobile-first personal fitness, nutrition, recovery, and habit tracker designed for long-term daily use. The product intentionally feels closer to Duolingo, Habitica, Apple Fitness, and modern habit apps than to a corporate dashboard.
+FitTrack is a private, mobile-first workout, nutrition, recovery, and habit tracker for one user. It ships with a personalized home muscle-building plan and stores all records in the browser, so no account or backend setup is required.
 
-## Architectural Decisions
+## What works
 
-### 1. Unified Task Tracking Model
+- Real weekday-based workout selection (Monday is Plan Day 1)
+- Daily workout, nutrition, recovery, and habit logging
+- Set-by-set workout entries and nutrition notes
+- Automatic completion percentages, XP, levels, and streaks
+- Live 7-day and 30-day scores
+- Workout, nutrition, and weight trend charts
+- Body weight and measurement history
+- Compressed progress photos stored on the device
+- Weekly-plan task creation, editing, and deletion
+- Editable personal profile, goals, and equipment
+- JSON backup export and restore
+- Cross-tab synchronization in the same browser
 
-The critical product decision is that every trackable behavior is a **Task**:
+## Data storage
 
-- Workout: push ups, pull ups, plank
-- Nutrition: eggs, milk, protein intake
-- Recovery: sleep, stretching
-- Supplements: creatine
-- Future behaviors: water intake, reading, language learning
+All active application data is stored in browser `localStorage` under `fittrack-single-user-v1`.
 
-The application does **not** create separate workout log or meal log systems. All completion data lands in `daily_logs`, making future AI coaching and analytics straightforward because one table describes adherence across every category.
+This makes the app simple and private, but clearing browser/site data will remove the records. Use **Profile → Export backup** regularly. A backup contains the profile, plan, daily logs, measurements, and progress photos.
 
-### 2. Supabase-First Backend
+Data does not automatically synchronize between different browsers or devices. The old Supabase schema remains in the repository for a possible future migration, but it is not required by the current single-user app.
 
-The database schema is built for Supabase PostgreSQL with Auth row-level security. The initial migration includes:
+## Daily scoring
 
-- `goals`
-- `weekly_programs`
-- `tasks`
-- `daily_logs`
-- `body_metrics`
-- `progress_photos`
-- `user_stats`
-- `streak_history`
-- `achievements`
-- `unlocked_achievements`
+- Tasks completed up to their target contribute up to 100%.
+- Daily completion is the average completion of all scheduled tasks.
+- A day at 70% or higher counts toward the streak.
+- XP is awarded once per date when a task reaches 100%.
+- Workout tasks follow their selected plan day.
+- Nutrition, recovery, and habit tasks appear every day.
 
-The schema keeps achievement definitions flexible in the database instead of hardcoding them in application logic.
-
-### 3. Gamification From Day One
-
-The UI and schema support:
-
-- Successful-day threshold: daily completion >= 70%
-- Current streak and best streak
-- Streak history
-- XP reward per task
-- Level formula: `floor(total_xp / 100)`
-- Database-defined achievements
-
-### 4. AI-Ready Data Layer
-
-AI is intentionally not implemented yet. However, the data model stores enough structured information for future coaching to analyze:
-
-- Daily adherence
-- Weekly adherence
-- Workout performance
-- Nutrition consistency
-- Recovery and sleep consistency
-- Weight and body measurement trends
-- Progress photo timelines
-- Streak and XP progression
-
-Future AI features can generate workout plans, progressive overload changes, nutrition recommendations, recovery advice, and habit suggestions without redesigning the schema.
-
-## Tech Stack
-
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- shadcn/ui-compatible primitives
-- Supabase Auth, Database, and Storage
-- Recharts
-- Vercel deployment
-
-## Project Structure
-
-```text
-app/                    Next.js App Router screens
-components/             Shared UI, navigation, charts, task cards
-components/ui/          shadcn/ui-style primitives
-lib/                    Types, sample data, utilities, server actions, Supabase clients
-supabase/migrations/    PostgreSQL schema and RLS policies
-supabase/seed.sql       Seed starter notes
-```
-
-## Main Screens
-
-Bottom navigation includes:
-
-1. Today
-2. Weekly Plan
-3. Progress
-4. Profile
-
-### Today
-
-Primary daily-use screen showing:
-
-- Current streak
-- Best streak
-- Daily completion percentage
-- XP progress
-- Daily score
-- Workout, nutrition, recovery, and habit task sections
-- Instant progress calculation per task
-
-### Weekly Plan
-
-Editable weekly program view with day-based grouping, sort-order affordances, and a unified task editor.
-
-### Progress
-
-Trend and motivation screen with:
-
-- Weight trend
-- Completion trend
-- Workout adherence
-- Nutrition adherence
-- Weekly/monthly score
-- Current/best streak
-- XP progress
-- Achievement history
-- Progress photos timeline
-- Body measurements
-
-### Profile
-
-Personal setup, equipment, settings, and AI-ready export entry point.
-
-## Local Development
+## Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-Supabase environment variables:
+Open [http://localhost:3000](http://localhost:3000).
+
+Verification commands:
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+npm run typecheck
+npm run lint
+npm run build
 ```
 
-When these variables are present and the user is authenticated, the app reads tasks and daily logs from Supabase and writes task progress through server actions. Without them, the UI falls back to the built-in home muscle-building sample plan so the app remains previewable.
+## Main structure
 
-## Database Setup
-
-Apply the migration in `supabase/migrations/202605300001_initial_ai_ready_schema.sql` to a Supabase project. It creates the AI-ready unified schema, row-level security policies, indexes, completion calculation trigger, level helper, and starter achievement definitions.
-
-## Deployment
-
-Deploy to Vercel and configure the Supabase environment variables in the Vercel project settings. Supabase Storage should be used for `progress_photos.image_url` assets.
+```text
+app/                       Next.js screens
+components/                Forms, cards, navigation, and charts
+lib/fittrack-store.tsx     Browser persistence and mutations
+lib/tracking.ts            Dates, scoring, streaks, XP, and achievements
+lib/sample-data.ts         Personalized starter plan
+supabase/                  Legacy/future multi-device backend schema
+```

@@ -1,54 +1,158 @@
-import { Download, Ruler, Settings, Target, UserRound, Weight } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { Download, HardDrive, Save, Upload } from 'lucide-react';
 import { ScreenHeader } from '@/components/app-shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { adhdTips, profile, programRules } from '@/lib/sample-data';
-
-const profileItems = [
-  { label: 'Age', value: profile.age, icon: UserRound },
-  { label: 'Height', value: profile.height, icon: Ruler },
-  { label: 'Current Weight', value: profile.weight, icon: Weight },
-  { label: 'Goal', value: profile.goal, icon: Target },
-];
+import { useFitTrack } from '@/lib/fittrack-store';
+import { adhdTips, programRules } from '@/lib/sample-data';
+import { latestMetric } from '@/lib/tracking';
+import type { FitTrackData, UserProfile } from '@/lib/types';
 
 export default function ProfilePage() {
+  const { data, saveProfile, importData } = useFitTrack();
+  const [message, setMessage] = useState('');
+  const currentMetric = latestMetric(data.body_metrics);
+
+  const handleProfile = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const nextProfile: UserProfile = {
+      name: String(form.get('name')).trim(),
+      age: String(form.get('age')).trim(),
+      height: String(form.get('height')).trim(),
+      goal: String(form.get('goal')).trim(),
+      weekly_goal: String(form.get('weeklyGoal')).trim(),
+      equipment: String(form.get('equipment'))
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    };
+    saveProfile(nextProfile);
+    setMessage('Profile saved.');
+  };
+
+  const exportData = () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `fittrack-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    setMessage('Backup exported.');
+  };
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text()) as FitTrackData;
+      importData(parsed);
+      setMessage('Backup restored.');
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Could not import this backup.');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   return (
     <div>
-      <ScreenHeader eyebrow="Profile" title="Your setup" subtitle="Profile and equipment now match the supplied home muscle-building program and stay ready for future AI coaching." />
+      <ScreenHeader
+        eyebrow="Profile"
+        title={data.profile.name ? `${data.profile.name}'s setup` : 'Your setup'}
+        subtitle="This is a private, single-user profile stored on your device."
+      />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
         <Card className="bg-slate-950 text-white">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="grid h-20 w-20 place-items-center rounded-full bg-green-400 text-4xl">💪</div>
-            <div><p className="text-sm font-black uppercase text-green-300">Home Muscle Building</p><h2 className="text-2xl font-black">Daily Builder</h2><p className="text-sm font-bold text-slate-300">Goal: {profile.weeklyGoal}. Add more calories if weight does not increase.</p></div>
+            <div>
+              <p className="text-sm font-black uppercase text-green-300">Home muscle building</p>
+              <h2 className="text-2xl font-black">{data.profile.goal}</h2>
+              <p className="text-sm font-bold text-slate-300">{data.profile.weekly_goal}</p>
+            </div>
           </div>
         </Card>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {profileItems.map((item) => {
-            const Icon = item.icon;
-            return <Card key={item.label} className="p-4"><Icon className="h-6 w-6 text-green-600" /><p className="mt-3 text-xl font-black">{item.value}</p><p className="text-xs font-black uppercase text-muted-foreground">{item.label}</p></Card>;
-          })}
-        </div>
+
         <Card>
-          <h2 className="text-xl font-black">Equipment</h2>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {profile.equipment.map((item) => <span key={item} className="rounded-full bg-green-100 px-4 py-2 text-sm font-black text-green-700">{item}</span>)}
-          </div>
+          <h2 className="text-xl font-black">Personal settings</h2>
+          <form
+            key={`${JSON.stringify(data.profile)}-${currentMetric?.weight ?? ''}`}
+            onSubmit={handleProfile}
+            className="mt-4 grid gap-4 sm:grid-cols-2"
+          >
+            {[
+              ['Name', 'name', data.profile.name, 'text'],
+              ['Age', 'age', data.profile.age, 'number'],
+              ['Height (cm)', 'height', data.profile.height, 'number'],
+              ['Current weight', 'currentWeight', currentMetric?.weight?.toString() ?? 'Not recorded', 'text'],
+            ].map(([label, name, value, type]) => (
+              <label key={name}>
+                <span className="mb-2 block text-sm font-bold">{label}</span>
+                <input
+                  className="w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100"
+                  name={name}
+                  type={type}
+                  step={type === 'number' ? '0.1' : undefined}
+                  defaultValue={value}
+                  disabled={name === 'currentWeight'}
+                  required={name !== 'currentWeight'}
+                />
+              </label>
+            ))}
+            <label className="sm:col-span-2">
+              <span className="mb-2 block text-sm font-bold">Main goal</span>
+              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="goal" defaultValue={data.profile.goal} required />
+            </label>
+            <label className="sm:col-span-2">
+              <span className="mb-2 block text-sm font-bold">Weekly goal</span>
+              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="weeklyGoal" defaultValue={data.profile.weekly_goal} required />
+            </label>
+            <label className="sm:col-span-2">
+              <span className="mb-2 block text-sm font-bold">Equipment, separated by commas</span>
+              <textarea className="min-h-24 w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="equipment" defaultValue={data.profile.equipment.join(', ')} />
+            </label>
+            <Button className="sm:col-span-2"><Save className="h-5 w-5" /> Save profile</Button>
+          </form>
         </Card>
+
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
-            <h2 className="text-xl font-black">Fast muscle-gain rules</h2>
+            <h2 className="text-xl font-black">Muscle-gain rules</h2>
             <div className="mt-4 space-y-3">
-              {programRules.map((rule) => <div key={rule} className="flex items-center gap-3 rounded-2xl bg-slate-50 p-3 font-bold"><Settings className="h-5 w-5 text-muted-foreground" />{rule}</div>)}
+              {programRules.map((rule) => <div key={rule} className="rounded-2xl bg-slate-50 p-3 font-bold">{rule}</div>)}
             </div>
           </Card>
           <Card>
-            <h2 className="text-xl font-black">ADHD training tips</h2>
+            <h2 className="text-xl font-black">Consistency tips</h2>
             <div className="mt-4 space-y-3">
-              {adhdTips.map((tip) => <div key={tip} className="flex items-center gap-3 rounded-2xl bg-yellow-50 p-3 font-bold"><Settings className="h-5 w-5 text-yellow-600" />{tip}</div>)}
+              {adhdTips.map((tip) => <div key={tip} className="rounded-2xl bg-yellow-50 p-3 font-bold">{tip}</div>)}
             </div>
           </Card>
         </div>
-        <Button className="w-full" size="lg"><Download className="h-5 w-5" /> Export AI-ready data</Button>
+
+        <Card>
+          <HardDrive className="h-7 w-7 text-green-600" />
+          <h2 className="mt-2 text-xl font-black">Your data</h2>
+          <p className="mt-1 text-sm font-medium text-muted-foreground">
+            Browser storage is private and simple, but clearing browser data removes it. Export a backup regularly.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Button type="button" size="lg" onClick={exportData}>
+              <Download className="h-5 w-5" /> Export backup
+            </Button>
+            <label className="flex cursor-pointer items-center justify-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-bold text-slate-900">
+              <Upload className="h-5 w-5" /> Restore backup
+              <input type="file" accept="application/json,.json" className="sr-only" onChange={handleImport} />
+            </label>
+          </div>
+          {message ? <p className="mt-3 text-sm font-bold text-green-700">{message}</p> : null}
+        </Card>
       </section>
     </div>
   );

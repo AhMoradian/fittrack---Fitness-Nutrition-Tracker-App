@@ -11,7 +11,7 @@ export async function recordBodyMetric(
   chest?: number,
   arm?: number
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
@@ -42,7 +42,7 @@ export async function getBodyMetrics(
   endDate?: string,
   limit = 100
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
@@ -69,7 +69,7 @@ export async function getBodyMetrics(
 }
 
 export async function getLatestBodyMetric() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
@@ -87,7 +87,7 @@ export async function getLatestBodyMetric() {
 }
 
 export async function deleteBodyMetric(metricId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');

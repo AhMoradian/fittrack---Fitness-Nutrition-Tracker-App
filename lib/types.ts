@@ -66,10 +66,48 @@ export type Achievement = {
 export type BodyMetric = {
   id: string;
   date: string;
-  weight: number;
+  weight?: number;
   body_fat?: number;
   waist?: number;
   chest?: number;
   arm?: number;
   created_at: string;
+};
+
+export type UserProfile = {
+  name: string;
+  age: string;
+  height: string;
+  goal: string;
+  weekly_goal: string;
+  equipment: string[];
+};
+
+export type ProgressPhoto = {
+  id: string;
+  date: string;
+  image_url: string;
+  notes?: string;
+  created_at: string;
+};
+
+export type FitTrackData = {
+  version: 1;
+  started_at: string;
+  tasks: Task[];
+  daily_logs: DailyLog[];
+  body_metrics: BodyMetric[];
+  progress_photos: ProgressPhoto[];
+  profile: UserProfile;
+};
+
+export type DailySummary = {
+  date: string;
+  completion: number;
+  workout: number;
+  nutrition: number;
+  recovery: number;
+  habit: number;
+  earned_xp: number;
+  successful: boolean;
 };
