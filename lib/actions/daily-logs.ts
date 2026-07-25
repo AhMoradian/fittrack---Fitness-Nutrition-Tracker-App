@@ -11,7 +11,7 @@ export async function logTaskCompletion(
   notes?: string,
   setValues?: number[]
 ) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
@@ -38,7 +38,7 @@ export async function logTaskCompletion(
 }
 
 export async function getDailyLogsForDate(date: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
@@ -55,7 +55,7 @@ export async function getDailyLogsForDate(date: string) {
 }
 
 export async function deleteDailyLog(logId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) throw new Error('Not authenticated');
