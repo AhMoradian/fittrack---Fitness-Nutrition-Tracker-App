@@ -8,7 +8,12 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { profile as starterProfile, tasks as starterTasks } from '@/lib/sample-data';
+import {
+  COACH_PLAN_VERSION,
+  COACH_PROGRAM_ID,
+  profile as starterProfile,
+  tasks as starterTasks,
+} from '@/lib/sample-data';
 import { localDateKey } from '@/lib/tracking';
 import type {
   BodyMetric,
@@ -17,6 +22,7 @@ import type {
   ProgressPhoto,
   Task,
   UserProfile,
+  WeeklyCheckIn,
 } from '@/lib/types';
 
 const STORAGE_KEY = 'fittrack-single-user-v1';
@@ -27,6 +33,7 @@ function createStarterData(): FitTrackData {
   return {
     version: 1,
     started_at: today,
+    coach_plan_version: COACH_PLAN_VERSION,
     tasks: starterTasks.map((task) => ({ ...task })),
     daily_logs: [],
     body_metrics: Number.isFinite(weight)
@@ -40,6 +47,7 @@ function createStarterData(): FitTrackData {
         ]
       : [],
     progress_photos: [],
+    weekly_check_ins: [],
     profile: {
       name: 'Amir',
       age: starterProfile.age,
@@ -48,6 +56,24 @@ function createStarterData(): FitTrackData {
       weekly_goal: starterProfile.weeklyGoal,
       equipment: [...starterProfile.equipment],
     },
+  };
+}
+
+function normalizeData(parsed: FitTrackData): FitTrackData {
+  const needsCoachUpdate = parsed.coach_plan_version !== COACH_PLAN_VERSION;
+  const nonCoachTasks = parsed.tasks.filter(
+    (task) =>
+      task.program_id !== COACH_PROGRAM_ID &&
+      task.program_id !== 'home-muscle-building-program',
+  );
+
+  return {
+    ...parsed,
+    coach_plan_version: COACH_PLAN_VERSION,
+    tasks: needsCoachUpdate
+      ? [...nonCoachTasks, ...starterTasks.map((task) => ({ ...task }))]
+      : parsed.tasks,
+    weekly_check_ins: parsed.weekly_check_ins ?? [],
   };
 }
 
@@ -61,6 +87,9 @@ type StoreValue = {
   deleteTask: (taskId: string) => void;
   addPhoto: (photo: Omit<ProgressPhoto, 'id' | 'created_at'>) => void;
   deletePhoto: (photoId: string) => void;
+  saveWeeklyCheckIn: (
+    checkIn: Omit<WeeklyCheckIn, 'id' | 'created_at'>,
+  ) => void;
   importData: (data: FitTrackData) => void;
 };
 
@@ -75,9 +104,11 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as FitTrackData;
-        // Loading persisted browser state after hydration is intentional.
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        if (parsed.version === 1 && Array.isArray(parsed.tasks)) setData(parsed);
+        if (parsed.version === 1 && Array.isArray(parsed.tasks)) {
+          // Loading persisted browser state after hydration is intentional.
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setData(normalizeData(parsed));
+        }
       }
     } catch (error) {
       console.error('Could not load FitTrack data.', error);
@@ -95,7 +126,7 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
     const syncTabs = (event: StorageEvent) => {
       if (event.key !== STORAGE_KEY || !event.newValue) return;
       try {
-        setData(JSON.parse(event.newValue) as FitTrackData);
+        setData(normalizeData(JSON.parse(event.newValue) as FitTrackData));
       } catch {
         // Ignore malformed values written outside FitTrack.
       }
@@ -184,11 +215,36 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
     }));
   }, []);
 
+  const saveWeeklyCheckIn = useCallback(
+    (checkIn: Omit<WeeklyCheckIn, 'id' | 'created_at'>) => {
+      setData((current) => {
+        const existing = current.weekly_check_ins.find(
+          (entry) => entry.week_ending === checkIn.week_ending,
+        );
+        const next: WeeklyCheckIn = {
+          ...checkIn,
+          id: existing?.id ?? crypto.randomUUID(),
+          created_at: existing?.created_at ?? new Date().toISOString(),
+        };
+        return {
+          ...current,
+          weekly_check_ins: [
+            ...current.weekly_check_ins.filter(
+              (entry) => entry.week_ending !== checkIn.week_ending,
+            ),
+            next,
+          ].sort((a, b) => b.week_ending.localeCompare(a.week_ending)),
+        };
+      });
+    },
+    [],
+  );
+
   const importData = useCallback((nextData: FitTrackData) => {
     if (nextData.version !== 1 || !Array.isArray(nextData.tasks)) {
       throw new Error('This is not a valid FitTrack backup.');
     }
-    setData(nextData);
+    setData(normalizeData(nextData));
   }, []);
 
   const value = useMemo(
@@ -202,6 +258,7 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
       deleteTask,
       addPhoto,
       deletePhoto,
+      saveWeeklyCheckIn,
       importData,
     }),
     [
@@ -215,6 +272,7 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
       saveMetric,
       saveProfile,
       saveTask,
+      saveWeeklyCheckIn,
     ],
   );
 

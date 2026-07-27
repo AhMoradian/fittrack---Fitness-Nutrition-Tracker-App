@@ -24,7 +24,7 @@ export function TaskEditor({
     const perSetTarget = setCount ? Math.max(1, Math.round(targetValue / setCount)) : 0;
     const nextTask: Task = {
       id: task?.id ?? crypto.randomUUID(),
-      program_id: task?.program_id ?? 'home-muscle-building-program',
+      program_id: task?.program_id ?? 'custom-user-program',
       title: String(form.get('title')).trim(),
       category,
       target_value: targetValue,

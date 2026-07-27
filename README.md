@@ -12,6 +12,9 @@ FitTrack is a private, mobile-first workout, nutrition, recovery, and habit trac
 - Workout, nutrition, and weight trend charts
 - Body weight and measurement history
 - Compressed progress photos stored on the device
+- Sunday check-ins for weight averages, adherence, recovery, strength, and skills
+- Copyable coach summaries for updating the next training week in chat
+- Versioned coach-plan upgrades that preserve history and custom tasks
 - Weekly-plan task creation, editing, and deletion
 - Editable personal profile, goals, and equipment
 - JSON backup export and restore
@@ -21,7 +24,7 @@ FitTrack is a private, mobile-first workout, nutrition, recovery, and habit trac
 
 All active application data is stored in browser `localStorage` under `fittrack-single-user-v1`.
 
-This makes the app simple and private, but clearing browser/site data will remove the records. Use **Profile → Export backup** regularly. A backup contains the profile, plan, daily logs, measurements, and progress photos.
+This makes the app simple and private, but clearing browser/site data will remove the records. Use **Profile → Export backup** regularly. A backup contains the profile, plan, daily logs, measurements, progress photos, and weekly check-ins.
 
 Data does not automatically synchronize between different browsers or devices. The old Supabase schema remains in the repository for a possible future migration, but it is not required by the current single-user app.
 
@@ -58,6 +61,6 @@ app/                       Next.js screens
 components/                Forms, cards, navigation, and charts
 lib/fittrack-store.tsx     Browser persistence and mutations
 lib/tracking.ts            Dates, scoring, streaks, XP, and achievements
-lib/sample-data.ts         Personalized starter plan
+lib/sample-data.ts         Versioned personal coach plan
 supabase/                  Legacy/future multi-device backend schema
 ```

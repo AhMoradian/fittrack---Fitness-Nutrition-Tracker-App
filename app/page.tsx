@@ -30,12 +30,12 @@ const sections: {
 ];
 
 const planDayNames: Record<number, string> = {
-  1: 'Push',
-  2: 'Back & posture',
-  3: 'Legs & core',
+  1: 'Strength A',
+  2: 'Handstand, L-sit & mobility',
+  3: 'Strength B',
   4: 'Active recovery',
-  5: 'Push progression',
-  6: 'Back progression',
+  5: 'Strength A',
+  6: 'Handstand, L-sit & mobility',
   7: 'Rest',
 };
 
