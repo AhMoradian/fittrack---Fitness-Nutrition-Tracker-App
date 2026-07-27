@@ -1,164 +1,439 @@
 import { levelFromXp, percentage } from '@/lib/utils';
-import type { Achievement, BodyMetric, DailyLog, Task, UserStats } from '@/lib/types';
+import type { BodyMetric, DailyLog, Task, UserStats } from '@/lib/types';
 
-const today = '2026-05-30';
+const seedDate = '2026-07-27';
 
-const workout = (task: Omit<Task, 'program_id' | 'category' | 'created_at' | 'ai_configurable'>): Task => ({
+export const COACH_PROGRAM_ID = 'personal-calisthenics-coach-plan';
+export const COACH_PLAN_VERSION = 2;
+
+export const coachPlan = {
+  version: COACH_PLAN_VERSION,
+  updatedAt: seedDate,
+  phase: 'Foundation · Week 1',
+  focus: 'Muscle first, then balance skills, flexibility, and fitness',
+  nutrition: '2,400–2,500 kcal · 90–110 g protein · milk optional',
+};
+
+const workout = (
+  task: Omit<Task, 'program_id' | 'category' | 'created_at' | 'ai_configurable'>,
+): Task => ({
   ...task,
-  program_id: 'home-muscle-building-program',
+  program_id: COACH_PROGRAM_ID,
   category: 'workout',
-  created_at: today,
+  created_at: seedDate,
   ai_configurable: true,
 });
 
-const nutrition = (task: Omit<Task, 'program_id' | 'category' | 'created_at' | 'ai_configurable' | 'day_index'>): Task => ({
+const nutrition = (
+  task: Omit<
+    Task,
+    'program_id' | 'category' | 'created_at' | 'ai_configurable' | 'day_index'
+  >,
+): Task => ({
   ...task,
-  program_id: 'home-muscle-building-program',
+  program_id: COACH_PROGRAM_ID,
   category: 'nutrition',
   day_index: 1,
-  created_at: today,
+  created_at: seedDate,
   ai_configurable: true,
 });
 
+const setTargets = (values: number[], unit: string, note: string) =>
+  values.map((value, index) => ({
+    label: `Set ${index + 1}`,
+    target_value: value,
+    target_unit: unit,
+    note,
+  }));
+
+const strengthA = (dayIndex: number, suffix: string): Task[] => [
+  workout({
+    id: `pull-ups-${suffix}`,
+    title: 'Controlled pull-ups',
+    target_value: 6,
+    target_unit: 'reps',
+    xp_reward: 25,
+    sort_order: 1,
+    day_index: dayIndex,
+    description:
+      'Accumulate clean reps without grinding. Stop with 1 rep in reserve and rest 2–3 minutes.',
+    set_targets: setTargets([2, 1, 1, 1, 1], 'reps', '1–2 clean reps'),
+  }),
+  workout({
+    id: `push-ups-${suffix}`,
+    title: 'Push-ups',
+    target_value: 20,
+    target_unit: 'reps',
+    xp_reward: 20,
+    sort_order: 2,
+    day_index: dayIndex,
+    description:
+      'Straight body line, controlled depth, and 1–2 good reps left in reserve.',
+    set_targets: setTargets([5, 5, 5, 5], 'reps', '4–6 reps'),
+  }),
+  workout({
+    id: `split-squats-${suffix}`,
+    title: 'Bulgarian split squats',
+    target_value: 30,
+    target_unit: 'reps/side',
+    xp_reward: 20,
+    sort_order: 3,
+    day_index: dayIndex,
+    description:
+      'Use bodyweight first. Each logged value is the reps completed on each side.',
+    set_targets: setTargets([10, 10, 10], 'reps/side', '8–12 each side'),
+  }),
+  workout({
+    id: `backpack-rows-${suffix}`,
+    title: 'Backpack rows',
+    target_value: 30,
+    target_unit: 'reps',
+    xp_reward: 20,
+    sort_order: 4,
+    day_index: dayIndex,
+    description:
+      'Brace the torso and squeeze the shoulder blades. Add books only after all sets are clean.',
+    set_targets: setTargets([10, 10, 10], 'reps', '8–12 reps'),
+  }),
+  workout({
+    id: `hollow-hold-${suffix}`,
+    title: 'Hollow-body hold',
+    target_value: 60,
+    target_unit: 'sec',
+    xp_reward: 15,
+    sort_order: 5,
+    day_index: dayIndex,
+    description: 'Keep the lower back gently pressed into the floor.',
+    set_targets: setTargets([20, 20, 20], 'sec', '15–25 sec'),
+  }),
+];
+
+const strengthB = (dayIndex: number): Task[] => [
+  workout({
+    id: 'negative-pull-ups-b1',
+    title: 'Slow negative pull-ups',
+    target_value: 8,
+    target_unit: 'reps',
+    xp_reward: 25,
+    sort_order: 1,
+    day_index: dayIndex,
+    description:
+      'Start at the top and lower for 5–8 seconds. Stop if shoulder or elbow pain appears.',
+    set_targets: setTargets([2, 2, 2, 2], 'reps', '5–8 sec lowering'),
+  }),
+  workout({
+    id: 'full-dips-b1',
+    title: 'Full dips',
+    target_value: 16,
+    target_unit: 'reps',
+    xp_reward: 20,
+    sort_order: 2,
+    day_index: dayIndex,
+    description:
+      'Use stable parallel bars. Keep shoulders down and stop 1–2 reps before failure.',
+    set_targets: setTargets([4, 4, 4, 4], 'reps', '3–5 reps'),
+  }),
+  workout({
+    id: 'backpack-squats-b1',
+    title: 'Backpack squats',
+    target_value: 48,
+    target_unit: 'reps',
+    xp_reward: 20,
+    sort_order: 3,
+    day_index: dayIndex,
+    description: 'Use a secure backpack and controlled depth. Add load gradually.',
+    set_targets: setTargets([12, 12, 12, 12], 'reps', '10–15 reps'),
+  }),
+  workout({
+    id: 'pike-push-ups-b1',
+    title: 'Pike push-ups',
+    target_value: 18,
+    target_unit: 'reps',
+    xp_reward: 20,
+    sort_order: 4,
+    day_index: dayIndex,
+    description:
+      'Build overhead strength for the handstand. Keep the head path controlled.',
+    set_targets: setTargets([6, 6, 6], 'reps', '5–8 reps'),
+  }),
+  workout({
+    id: 'single-leg-bridge-b1',
+    title: 'Single-leg glute bridge',
+    target_value: 36,
+    target_unit: 'reps/side',
+    xp_reward: 15,
+    sort_order: 5,
+    day_index: dayIndex,
+    description: 'Each logged value is the reps completed on each side.',
+    set_targets: setTargets([12, 12, 12], 'reps/side', '10–15 each side'),
+  }),
+  workout({
+    id: 'reverse-crunch-b1',
+    title: 'Reverse crunch',
+    target_value: 30,
+    target_unit: 'reps',
+    xp_reward: 15,
+    sort_order: 6,
+    day_index: dayIndex,
+    description: 'Curl the pelvis gently instead of swinging the legs.',
+    set_targets: setTargets([10, 10, 10], 'reps', '8–15 reps'),
+  }),
+];
+
+const skillDay = (dayIndex: number, suffix: string): Task[] => [
+  workout({
+    id: `wall-handstand-${suffix}`,
+    title: 'Chest-to-wall handstand',
+    target_value: 100,
+    target_unit: 'sec',
+    xp_reward: 20,
+    sort_order: 1,
+    day_index: dayIndex,
+    description:
+      'Warm up wrists first. Never practise balance when dizzy, sleepy, or sedated.',
+    set_targets: setTargets([20, 20, 20, 20, 20], 'sec', '15–25 sec'),
+  }),
+  workout({
+    id: `support-hold-${suffix}`,
+    title: 'Straight-arm support hold',
+    target_value: 48,
+    target_unit: 'sec',
+    xp_reward: 15,
+    sort_order: 2,
+    day_index: dayIndex,
+    description:
+      'Use stable equal-height supports on a non-slip floor and push the shoulders down.',
+    set_targets: setTargets([12, 12, 12, 12], 'sec', '10–20 sec'),
+  }),
+  workout({
+    id: `tuck-l-sit-${suffix}`,
+    title: 'Tuck L-sit',
+    target_value: 30,
+    target_unit: 'sec',
+    xp_reward: 20,
+    sort_order: 3,
+    day_index: dayIndex,
+    description:
+      'Keep knees tucked and shoulders pressed down. Short clean holds count.',
+    set_targets: setTargets([6, 6, 6, 6, 6], 'sec', '5–10 sec'),
+  }),
+  workout({
+    id: `mobility-${suffix}`,
+    title: 'Shoulder, wrist, hip & hamstring mobility',
+    target_value: 12,
+    target_unit: 'min',
+    xp_reward: 15,
+    sort_order: 4,
+    day_index: dayIndex,
+    description:
+      'Move gently through comfortable ranges; flexibility work should not feel sharp.',
+  }),
+];
+
 export const profile = {
-  age: '24.5',
-  height: '177 cm',
+  age: '24',
+  height: '176.5 cm',
   weight: '55 kg',
-  goal: 'Muscle Gain + Better Posture',
-  weeklyGoal: 'Gain 0.3–0.6 kg per week',
-  equipment: ['Pull-up bar', 'Backpack', 'Chair', '2kg dumbbells'],
+  goal: 'Muscle gain, balance skills, flexibility, and fitness',
+  weeklyGoal: 'Gain 0.15–0.30 kg per week',
+  equipment: [
+    'Pull-up bar',
+    'Backpack',
+    'Sturdy chairs',
+    'Wall',
+    '2kg dumbbells',
+    'Park dip bars',
+  ],
 };
 
 export const programRules = [
-  'Train consistently',
-  'Eat more calories',
-  'Sleep 7.5–9 hours',
-  'Track progress weekly',
-  'Add reps every week',
+  'Leave 1–2 good reps in reserve',
+  'Rest 2–3 minutes on hard sets',
+  'Add reps before adding backpack weight',
+  'No maximum-rep testing until week 4',
+  'Use the Sunday check-in for coach updates',
 ];
 
-export const adhdTips = ['Start with only 5 minutes', 'Use music', 'Track records', 'Take progress photos', 'Focus on consistency, not perfection'];
+export const adhdTips = [
+  'Start with only 5 minutes',
+  'Use music',
+  'Track records',
+  'Take progress photos',
+  'Focus on consistency, not perfection',
+];
 
 export const tasks: Task[] = [
-  workout({ id: 'push-ups', title: 'Push-ups', target_value: 48, target_unit: 'reps', xp_reward: 20, sort_order: 1, day_index: 1, description: 'Chest, shoulders, and triceps. Keep a straight body line.', set_targets: [1, 2, 3, 4].map((set) => ({ label: `Set ${set}`, target_value: 12, target_unit: 'reps', note: '6–12 reps' })) }),
-  workout({ id: 'decline-push-ups', title: 'Decline Push-ups', target_value: 30, target_unit: 'reps', xp_reward: 20, sort_order: 2, day_index: 1, description: 'Feet elevated for upper chest and shoulder control.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 10, target_unit: 'reps', note: '6–10 reps' })) }),
-  workout({ id: 'chair-dips', title: 'Chair Dips', target_value: 36, target_unit: 'reps', xp_reward: 20, sort_order: 3, day_index: 1, description: 'Triceps focus. Keep shoulders down and elbows controlled.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 12, target_unit: 'reps', note: '8–12 reps' })) }),
-  workout({ id: 'shoulder-press', title: 'Dumbbell Shoulder Press', target_value: 45, target_unit: 'reps', xp_reward: 20, sort_order: 4, day_index: 1, description: 'Use 2kg dumbbells. Slow tempo and full control.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 15, target_unit: 'reps', note: '12–15 reps' })) }),
-  workout({ id: 'plank', title: 'Plank', target_value: 135, target_unit: 'sec', xp_reward: 20, sort_order: 5, day_index: 1, description: 'Brace core and glutes. Rest 60–90 seconds between push-day sets.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 45, target_unit: 'sec', note: '45 sec' })) }),
-
-  workout({ id: 'pull-ups', title: 'Pull-ups', target_value: 25, target_unit: 'reps', xp_reward: 25, sort_order: 1, day_index: 2, description: 'Five sets to failure. Record every set separately.', guidance: ['Straight back', 'Chest open', 'Shoulder blades back'], set_targets: [1, 2, 3, 4, 5].map((set) => ({ label: `Set ${set}`, target_value: 5, target_unit: 'reps', note: 'to failure' })) }),
-  workout({ id: 'negative-pull-ups', title: 'Negative Pull-ups', target_value: 9, target_unit: 'reps', xp_reward: 20, sort_order: 2, day_index: 2, description: 'Jump to the top and lower slowly.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 3, target_unit: 'reps', note: 'slow negatives' })) }),
-  workout({ id: 'backpack-rows', title: 'Backpack Rows', target_value: 48, target_unit: 'reps', xp_reward: 20, sort_order: 3, day_index: 2, description: 'Load backpack safely. Pull elbows back and squeeze shoulder blades.', set_targets: [1, 2, 3, 4].map((set) => ({ label: `Set ${set}`, target_value: 12, target_unit: 'reps' })) }),
-  workout({ id: 'ytw-shoulders', title: 'Y-T-W Shoulder Movements', target_value: 9, target_unit: 'rounds', xp_reward: 15, sort_order: 4, day_index: 2, description: 'Posture drill for rear shoulders and upper back.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 3, target_unit: 'rounds', note: 'Y + T + W' })) }),
-  workout({ id: 'superman-hold', title: 'Superman Hold', target_value: 45, target_unit: 'reps', xp_reward: 15, sort_order: 5, day_index: 2, description: 'Back extension control. Follow the plan target of 3 × 15.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 15, target_unit: 'reps' })) }),
-
-  workout({ id: 'bodyweight-squats', title: 'Bodyweight Squats', target_value: 80, target_unit: 'reps', xp_reward: 20, sort_order: 1, day_index: 3, set_targets: [1, 2, 3, 4].map((set) => ({ label: `Set ${set}`, target_value: 20, target_unit: 'reps' })) }),
-  workout({ id: 'backpack-squats', title: 'Backpack Squats', target_value: 48, target_unit: 'reps', xp_reward: 20, sort_order: 2, day_index: 3, set_targets: [1, 2, 3, 4].map((set) => ({ label: `Set ${set}`, target_value: 12, target_unit: 'reps' })) }),
-  workout({ id: 'lunges', title: 'Lunges', target_value: 60, target_unit: 'reps', xp_reward: 20, sort_order: 3, day_index: 3, description: '10 reps each leg per set.', set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 20, target_unit: 'reps', note: '10 each leg' })) }),
-  workout({ id: 'calf-raises', title: 'Calf Raises', target_value: 80, target_unit: 'reps', xp_reward: 15, sort_order: 4, day_index: 3, set_targets: [1, 2, 3, 4].map((set) => ({ label: `Set ${set}`, target_value: 20, target_unit: 'reps' })) }),
-  workout({ id: 'leg-raises', title: 'Leg Raises', target_value: 45, target_unit: 'reps', xp_reward: 15, sort_order: 5, day_index: 3, set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 15, target_unit: 'reps' })) }),
-  workout({ id: 'side-plank', title: 'Side Plank', target_value: 90, target_unit: 'sec', xp_reward: 15, sort_order: 6, day_index: 3, set_targets: [1, 2, 3].map((set) => ({ label: `Set ${set}`, target_value: 30, target_unit: 'sec', note: 'each side as able' })) }),
-
-  workout({ id: 'stretching', title: 'Stretching', target_value: 10, target_unit: 'min', xp_reward: 10, sort_order: 1, day_index: 4, description: 'Easy active recovery mobility.' }),
-  workout({ id: 'hang-bar', title: 'Hanging from Pull-up Bar', target_value: 3, target_unit: 'rounds', xp_reward: 10, sort_order: 2, day_index: 4, description: 'Relax shoulders and decompress.' }),
-  workout({ id: 'walking', title: 'Walking', target_value: 20, target_unit: 'min', xp_reward: 10, sort_order: 3, day_index: 4, description: 'Low-intensity recovery walk.' }),
-  workout({ id: 'chest-openers', title: 'Chest Opener Stretches', target_value: 5, target_unit: 'min', xp_reward: 10, sort_order: 4, day_index: 4 }),
-  workout({ id: 'hip-flexors', title: 'Hip Flexor Stretches', target_value: 5, target_unit: 'min', xp_reward: 10, sort_order: 5, day_index: 4 }),
-
-  workout({ id: 'push-repeat', title: 'PUSH Repeat — more reps/control', target_value: 1, target_unit: 'session', xp_reward: 35, sort_order: 1, day_index: 5, description: 'Repeat Day 1. Try more reps, more control, or shorter rest.' }),
-  workout({ id: 'back-repeat', title: 'BACK Repeat — posture focus', target_value: 1, target_unit: 'session', xp_reward: 35, sort_order: 1, day_index: 6, description: 'Repeat Day 2. Focus on pull-up progress, better posture, and slow movements.' }),
-  workout({ id: 'rest-day', title: 'Full Rest', target_value: 1, target_unit: 'day', xp_reward: 10, sort_order: 1, day_index: 7, description: 'Sleep well and recover.' }),
-
-  nutrition({ id: 'breakfast-eggs', title: 'Breakfast eggs', meal_time: 'Breakfast', target_value: 4, target_unit: 'eggs', xp_reward: 10, sort_order: 101, description: 'Eat 4 eggs with bread plus peanut butter or cheese.' }),
-  nutrition({ id: 'breakfast-banana', title: 'Breakfast banana', meal_time: 'Breakfast', target_value: 1, target_unit: 'banana', xp_reward: 5, sort_order: 102, description: 'Add fruit early so calories start easy.' }),
-  nutrition({ id: 'breakfast-milk', title: 'Breakfast milk', meal_time: 'Breakfast', target_value: 1, target_unit: 'glass', xp_reward: 5, sort_order: 103, description: 'One glass of milk with breakfast.' }),
-  nutrition({ id: 'mass-shake', title: 'Mass gain shake', meal_time: 'Snack 1', target_value: 1, target_unit: 'shake', xp_reward: 15, sort_order: 104, description: 'Blend 2 bananas, 2 glasses milk, 4 tbsp oats, 2 tbsp peanut butter, and honey.' }),
-  nutrition({ id: 'lunch-rice', title: 'Large rice lunch', meal_time: 'Lunch', target_value: 1, target_unit: 'large plate', xp_reward: 10, sort_order: 105, description: 'Large amount of rice with chicken, meat, or eggs. Add yogurt and potatoes when possible.' }),
-  nutrition({ id: 'pre-workout-carbs', title: 'Pre-workout carbs', meal_time: 'Pre-workout', target_value: 1, target_unit: 'serving', xp_reward: 10, sort_order: 106, description: 'Banana plus coffee or tea and dates before training.' }),
-  nutrition({ id: 'post-workout-food', title: 'Post-workout nutrition', meal_time: 'Post-workout', target_value: 1, target_unit: 'serving', xp_reward: 15, sort_order: 107, description: 'Within 1 hour: milk, banana, eggs, or the mass gainer shake.' }),
-  nutrition({ id: 'dinner-protein', title: 'Dinner protein meal', meal_time: 'Dinner', target_value: 1, target_unit: 'plate', xp_reward: 10, sort_order: 108, description: 'Rice or potatoes with a protein source and vegetables.' }),
-  nutrition({ id: 'before-sleep-calories', title: 'Before-sleep calories', meal_time: 'Before sleep', target_value: 1, target_unit: 'serving', xp_reward: 10, sort_order: 109, description: 'Milk, yogurt, or peanut butter before bed.' }),
-  nutrition({ id: 'water', title: 'Water intake', meal_time: 'All day', target_value: 8, target_unit: 'glasses', xp_reward: 10, sort_order: 110, description: 'Track water by glasses, not liters.' }),
-  nutrition({ id: 'creatine', title: 'Creatine monohydrate', meal_time: 'Optional supplement', target_value: 5, target_unit: 'g', xp_reward: 5, sort_order: 111, description: 'Optional: 3–5g daily to help strength and muscle gain.' }),
-  { id: 'sleep', program_id: 'home-muscle-building-program', title: 'Sleep', category: 'recovery', target_value: 8, target_unit: 'hours', xp_reward: 10, sort_order: 112, day_index: 1, created_at: today, description: 'Aim for 7.5–9 hours for muscle gain and recovery.', ai_configurable: true },
+  ...strengthA(1, 'a1'),
+  ...skillDay(2, 's1'),
+  ...strengthB(3),
+  workout({
+    id: 'recovery-walk',
+    title: 'Easy walk',
+    target_value: 20,
+    target_unit: 'min',
+    xp_reward: 10,
+    sort_order: 1,
+    day_index: 4,
+    description: 'Easy pace only. Your normal daily walking can count.',
+  }),
+  workout({
+    id: 'recovery-mobility',
+    title: 'Gentle full-body mobility',
+    target_value: 15,
+    target_unit: 'min',
+    xp_reward: 10,
+    sort_order: 2,
+    day_index: 4,
+    description:
+      'Focus on wrists, shoulders, hips, and hamstrings without forcing range.',
+  }),
+  workout({
+    id: 'recovery-hang',
+    title: 'Relaxed dead hang',
+    target_value: 60,
+    target_unit: 'sec',
+    xp_reward: 10,
+    sort_order: 3,
+    day_index: 4,
+    description: 'Use comfortable short holds and stop for shoulder pain.',
+    set_targets: setTargets([20, 20, 20], 'sec', 'comfortable hold'),
+  }),
+  ...strengthA(5, 'a2'),
+  ...skillDay(6, 's2'),
+  workout({
+    id: 'full-rest',
+    title: 'Full recovery day',
+    target_value: 1,
+    target_unit: 'day',
+    xp_reward: 10,
+    sort_order: 1,
+    day_index: 7,
+    description:
+      'No hard training. Walk gently if you want and complete the weekly check-in.',
+  }),
+  nutrition({
+    id: 'first-meal',
+    title: 'First complete meal',
+    meal_time: 'After waking',
+    target_value: 1,
+    target_unit: 'meal',
+    xp_reward: 10,
+    sort_order: 101,
+    description:
+      'Economical option: 2–3 eggs, bread, and a banana or dates. Follow your prescribed medication timing.',
+  }),
+  nutrition({
+    id: 'daily-feedings',
+    title: 'Regular meals and snack',
+    meal_time: 'All day',
+    target_value: 4,
+    target_unit: 'feedings',
+    xp_reward: 15,
+    sort_order: 102,
+    description:
+      'Aim for 3 meals plus 1 calorie-dense snack instead of relying on two meals.',
+  }),
+  nutrition({
+    id: 'protein-target',
+    title: 'Protein target',
+    meal_time: 'All day',
+    target_value: 95,
+    target_unit: 'g',
+    xp_reward: 20,
+    sort_order: 103,
+    description:
+      'Aim for 90–110 g. Budget choices: eggs, soy, lentils, beans, chickpeas, yogurt, and chicken legs.',
+  }),
+  nutrition({
+    id: 'economic-snack',
+    title: 'Calorie-dense snack',
+    meal_time: 'Afternoon',
+    target_value: 1,
+    target_unit: 'serving',
+    xp_reward: 15,
+    sort_order: 104,
+    description:
+      'Yogurt + banana + peanuts + dates. If dairy feels bad, use oats, banana, peanuts or tahini, dates, and water; add eggs separately.',
+  }),
+  nutrition({
+    id: 'calorie-target',
+    title: 'Daily calorie target',
+    meal_time: 'All day',
+    target_value: 2450,
+    target_unit: 'kcal',
+    xp_reward: 20,
+    sort_order: 105,
+    description:
+      'Starting range: 2,400–2,500 kcal. Adjust only from the 7-day weight average.',
+  }),
+  nutrition({
+    id: 'water',
+    title: 'Water intake',
+    meal_time: 'All day',
+    target_value: 7,
+    target_unit: 'glasses',
+    xp_reward: 10,
+    sort_order: 106,
+    description:
+      'Use thirst, urine colour, and Tehran heat as guides; drink more around training.',
+  }),
+  {
+    id: 'sleep',
+    program_id: COACH_PROGRAM_ID,
+    title: 'Sleep',
+    category: 'recovery',
+    target_value: 8,
+    target_unit: 'hours',
+    xp_reward: 15,
+    sort_order: 107,
+    day_index: 1,
+    created_at: seedDate,
+    description:
+      'Target 8–9 hours and keep wake time within the same 60-minute window. Review persistent major sleep swings with your prescriber.',
+    ai_configurable: true,
+  },
+  {
+    id: 'wake-consistency',
+    program_id: COACH_PROGRAM_ID,
+    title: 'Consistent wake time',
+    category: 'habit',
+    target_value: 1,
+    target_unit: 'day',
+    xp_reward: 10,
+    sort_order: 108,
+    day_index: 1,
+    created_at: seedDate,
+    description:
+      'Start with 11:00, within 30 minutes, and get outdoor light after waking.',
+    ai_configurable: true,
+  },
 ];
 
-const completed: Record<string, number | number[]> = {
-  'push-ups': [8, 9, 8, 10],
-  'decline-push-ups': [8, 7, 8],
-  'chair-dips': [8, 7, 6],
-  'shoulder-press': [15, 15, 12],
-  plank: [45, 35, 30],
-  'breakfast-eggs': 4,
-  'breakfast-banana': 1,
-  'breakfast-milk': 1,
-  'mass-shake': 1,
-  water: 5,
-  creatine: 5,
-  sleep: 7,
-};
+export const dailyLogs: DailyLog[] = [];
 
-const todayTaskIds = new Set([...tasks.filter((task) => task.day_index === 1).map((task) => task.id), ...tasks.filter((task) => task.category === 'nutrition' || task.category === 'recovery').map((task) => task.id)]);
-
-export const dailyLogs: DailyLog[] = tasks
-  .filter((task) => todayTaskIds.has(task.id))
-  .map((task) => {
-    const value = completed[task.id] ?? 0;
-    const total = Array.isArray(value) ? value.reduce((sum, item) => sum + item, 0) : value;
-    return {
-      id: `log-${task.id}`,
-      task_id: task.id,
-      date: today,
-      completed_value: total,
-      completion_percentage: percentage(total, task.target_value),
-      set_values: Array.isArray(value) ? value : undefined,
-      created_at: today,
-    };
-  });
-
-export const trendData = [
-  { date: 'Mon', completion: 68, workout: 62, nutrition: 72, score: 70, weight: 55.0 },
-  { date: 'Tue', completion: 74, workout: 70, nutrition: 77, score: 76, weight: 55.1 },
-  { date: 'Wed', completion: 82, workout: 84, nutrition: 80, score: 84, weight: 55.2 },
-  { date: 'Thu', completion: 71, workout: 65, nutrition: 78, score: 73, weight: 55.2 },
-  { date: 'Fri', completion: 86, workout: 88, nutrition: 84, score: 88, weight: 55.4 },
-  { date: 'Sat', completion: 79, workout: 76, nutrition: 82, score: 81, weight: 55.5 },
-  { date: 'Sun', completion: 90, workout: 92, nutrition: 88, score: 92, weight: 55.6 },
-];
-
-export const bodyMetrics: BodyMetric[] = trendData.map((day, index) => ({
-  id: `metric-${index}`,
-  date: `2026-05-${24 + index}`,
-  weight: day.weight,
-  body_fat: 14.5 + index * 0.05,
-  waist: 72 + index * 0.08,
-  chest: 87 + index * 0.12,
-  arm: 27 + index * 0.05,
-  created_at: today,
-}));
-
-export const achievements: Achievement[] = [
-  { id: 'first-workout', title: 'First Workout', description: 'Complete your first workout task.', icon: '💪', xp_reward: 25, condition_type: 'completed_workout_tasks', condition_value: 1, created_at: today, unlocked_at: '2026-05-24' },
-  { id: 'streak-7', title: '7 Day Streak', description: 'Keep a successful streak for 7 days.', icon: '🔥', xp_reward: 100, condition_type: 'streak_days', condition_value: 7, created_at: today, unlocked_at: '2026-05-30' },
-  { id: 'xp-1000', title: '1000 XP Earned', description: 'Earn 1000 total XP.', icon: '⚡', xp_reward: 150, condition_type: 'total_xp', condition_value: 1000, created_at: today },
-  { id: 'weight-gain-5kg', title: '5kg Weight Gain', description: 'Gain five kilograms toward your goal.', icon: '📈', xp_reward: 125, condition_type: 'weight_gain_kg', condition_value: 5, created_at: today },
+export const bodyMetrics: BodyMetric[] = [
+  {
+    id: 'starting-weight',
+    date: seedDate,
+    weight: 55,
+    created_at: seedDate,
+  },
 ];
 
 export function getDailySummary() {
-  const todayTasks = tasks.filter((task) => todayTaskIds.has(task.id));
-  const completion = Math.round(dailyLogs.reduce((sum, log) => sum + log.completion_percentage, 0) / dailyLogs.length);
-  const earnedXp = todayTasks.reduce((sum, task) => {
-    const log = dailyLogs.find((entry) => entry.task_id === task.id);
-    return sum + ((log?.completion_percentage ?? 0) >= 100 ? task.xp_reward : 0);
-  }, 0);
-  const totalXp = 1235 + earnedXp;
-  const stats: UserStats = { current_streak: 7, best_streak: 18, total_xp: totalXp, current_level: levelFromXp(totalXp) };
+  const totalXp = 0;
+  const stats: UserStats = {
+    current_streak: 0,
+    best_streak: 0,
+    total_xp: totalXp,
+    current_level: levelFromXp(totalXp),
+  };
   return {
-    date: today,
-    dailyCompletion: completion,
-    dailyScore: Math.round(completion * 0.75 + earnedXp * 0.25),
-    earnedXp,
+    date: seedDate,
+    dailyCompletion: 0,
+    dailyScore: percentage(0, 1),
+    earnedXp: 0,
     stats,
-    successfulDay: completion >= 70,
+    successfulDay: false,
   };
 }

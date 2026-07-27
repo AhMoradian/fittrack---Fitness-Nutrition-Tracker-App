@@ -7,27 +7,27 @@ import { TaskEditor } from '@/components/task-editor';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useFitTrack } from '@/lib/fittrack-store';
-import { programRules } from '@/lib/sample-data';
+import { coachPlan, programRules } from '@/lib/sample-data';
 import type { Task } from '@/lib/types';
 
 const dayNames: Record<number, string> = {
-  1: 'DAY 1 — PUSH',
-  2: 'DAY 2 — BACK & POSTURE',
-  3: 'DAY 3 — LEGS & CORE',
+  1: 'DAY 1 — STRENGTH A',
+  2: 'DAY 2 — HANDSTAND, L-SIT & MOBILITY',
+  3: 'DAY 3 — STRENGTH B',
   4: 'DAY 4 — ACTIVE RECOVERY',
-  5: 'DAY 5 — PUSH PROGRESSION',
-  6: 'DAY 6 — BACK PROGRESSION',
+  5: 'DAY 5 — STRENGTH A',
+  6: 'DAY 6 — HANDSTAND, L-SIT & MOBILITY',
   7: 'DAY 7 — REST',
 };
 
 const dayNotes: Record<number, string> = {
-  1: 'Chest, shoulders, and triceps.',
-  2: 'Pull-up strength and better posture.',
-  3: 'Build legs and core.',
+  1: 'Full body with controlled pull-ups and push-ups.',
+  2: 'Low-fatigue balance practice and comfortable flexibility.',
+  3: 'Full body with slow pulling, dips, squats, and overhead strength.',
   4: 'Move gently and restore.',
-  5: 'Add reps, control, or reduce rest.',
-  6: 'Build pulling strength with slow form.',
-  7: 'Sleep well and recover.',
+  5: 'Repeat Strength A without testing maximum reps.',
+  6: 'Repeat short skill holds with clean technique.',
+  7: 'Recover and complete the weekly check-in.',
 };
 
 function TaskRow({
@@ -88,6 +88,27 @@ export default function WeeklyPlanPage() {
         subtitle="Edit the plan whenever your exercises, equipment, or nutrition routine changes."
       />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
+        <Card className="border-green-200 bg-green-50">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase text-green-700">
+                Coach plan v{coachPlan.version} · Updated {coachPlan.updatedAt}
+              </p>
+              <h2 className="mt-1 text-xl font-black">{coachPlan.phase}</h2>
+              <p className="mt-1 text-sm font-bold text-slate-600">
+                {coachPlan.focus}
+              </p>
+            </div>
+            <span className="w-fit rounded-2xl bg-white px-4 py-3 text-sm font-black text-green-800 shadow-sm">
+              {coachPlan.nutrition}
+            </span>
+          </div>
+          <p className="mt-3 text-xs font-bold text-muted-foreground">
+            New coach-plan versions install automatically while your logs,
+            measurements, photos, check-ins, and custom tasks stay on this device.
+          </p>
+        </Card>
+
         <div className="grid gap-4 lg:grid-cols-[1fr_1.25fr]">
           <Card className="bg-slate-950 text-white">
             <Bot className="h-8 w-8 text-green-300" />

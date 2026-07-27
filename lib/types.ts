@@ -91,13 +91,35 @@ export type ProgressPhoto = {
   created_at: string;
 };
 
+export type WeeklyCheckIn = {
+  id: string;
+  week_ending: string;
+  average_weight?: number;
+  strength_sessions: number;
+  skill_sessions: number;
+  nutrition_days: number;
+  average_sleep?: number;
+  energy: number;
+  pushups_max?: number;
+  pullups_max?: number;
+  dips_max?: number;
+  handstand_seconds?: number;
+  l_sit_seconds?: number;
+  pain_notes?: string;
+  wins?: string;
+  challenges?: string;
+  created_at: string;
+};
+
 export type FitTrackData = {
   version: 1;
   started_at: string;
+  coach_plan_version: number;
   tasks: Task[];
   daily_logs: DailyLog[];
   body_metrics: BodyMetric[];
   progress_photos: ProgressPhoto[];
+  weekly_check_ins: WeeklyCheckIn[];
   profile: UserProfile;
 };
 
