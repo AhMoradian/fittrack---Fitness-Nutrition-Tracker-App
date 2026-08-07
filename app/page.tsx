@@ -127,7 +127,7 @@ export default function TodayPage() {
                 </div>
                 <span className="text-xs font-black text-muted-foreground">{groupedTasks.length} tasks</span>
               </div>
-              <div className="grid gap-3 lg:grid-cols-2">
+              <div className="min-w-0 grid gap-3 lg:grid-cols-2">
                 {groupedTasks.map((task) => (
                   <TaskCard
                     key={task.id}

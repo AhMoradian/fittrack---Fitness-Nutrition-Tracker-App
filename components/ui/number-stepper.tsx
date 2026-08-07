@@ -25,17 +25,17 @@ export const NumberStepper = React.forwardRef<
     const input = inputRef.current;
     if (!input || disabled) return;
 
+    input.blur();
     if (direction === 1) input.stepUp();
     else input.stepDown();
 
     onValueChange?.(input.value);
-    input.focus();
   };
 
   return (
     <div
       className={cn(
-        'flex min-h-12 items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-green-500',
+        'flex min-h-12 min-w-0 max-w-full items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-green-500',
         disabled && 'bg-slate-100 opacity-70',
         wrapperClassName,
       )}
@@ -44,7 +44,7 @@ export const NumberStepper = React.forwardRef<
         type="button"
         onClick={() => changeByStep(-1)}
         disabled={disabled}
-        className="grid h-12 w-12 shrink-0 place-items-center border-r text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
+        className="grid h-12 w-12 shrink-0 touch-manipulation place-items-center border-r text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
         aria-label={`Decrease ${props['aria-label'] ?? props.name ?? 'value'}`}
       >
         <Minus className="h-5 w-5" aria-hidden="true" />
@@ -68,7 +68,7 @@ export const NumberStepper = React.forwardRef<
         type="button"
         onClick={() => changeByStep(1)}
         disabled={disabled}
-        className="grid h-12 w-12 shrink-0 place-items-center border-l text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
+        className="grid h-12 w-12 shrink-0 touch-manipulation place-items-center border-l text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
         aria-label={`Increase ${props['aria-label'] ?? props.name ?? 'value'}`}
       >
         <Plus className="h-5 w-5" aria-hidden="true" />

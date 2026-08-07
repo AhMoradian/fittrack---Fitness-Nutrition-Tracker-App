@@ -58,8 +58,8 @@ export function TaskCard({
   };
 
   return (
-    <Card className="touch-card p-4">
-      <form onSubmit={handleSave} className="space-y-4">
+    <Card className="touch-card min-w-0 max-w-full overflow-hidden p-4">
+      <form onSubmit={handleSave} className="min-w-0 space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -86,15 +86,15 @@ export function TaskCard({
         </div>
 
         {isWorkoutSets ? (
-          <div className="rounded-3xl bg-slate-50 p-3">
+          <div className="min-w-0 overflow-hidden rounded-3xl bg-slate-50 p-3">
             <p className="mb-2 text-xs font-black uppercase text-muted-foreground">
               Log each set
             </p>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="min-w-0 grid gap-2 sm:grid-cols-2">
               {task.set_targets?.map((set, index) => (
                 <label
                   key={`${task.id}-${set.label}`}
-                  className="rounded-2xl border bg-white p-3"
+                  className="min-w-0 overflow-hidden rounded-2xl border bg-white p-3"
                 >
                   <span className="flex items-center justify-between gap-2 text-xs font-black text-muted-foreground">
                     <span>{set.label}</span>
