@@ -105,7 +105,7 @@ export default function WeeklyPlanPage() {
           </div>
           <p className="mt-3 text-xs font-bold text-muted-foreground">
             New coach-plan versions install automatically while your logs,
-            measurements, photos, check-ins, and custom tasks stay on this device.
+            measurements, photos, check-ins, and custom tasks stay intact.
           </p>
         </Card>
 

@@ -3,6 +3,7 @@
 import { PlusCircle, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { NumberStepper } from '@/components/ui/number-stepper';
 import type { Task, TaskCategory } from '@/lib/types';
 
 export function TaskEditor({
@@ -92,10 +93,9 @@ export function TaskEditor({
             <option key={day} value={day}>Plan Day {day}</option>
           ))}
         </select>
-        <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+        <NumberStepper
+          wrapperClassName="rounded-2xl"
           name="targetValue"
-          type="number"
           min="0.1"
           step="0.1"
           placeholder="Total target"
@@ -109,18 +109,16 @@ export function TaskEditor({
           defaultValue={task?.target_unit}
           required
         />
-        <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+        <NumberStepper
+          wrapperClassName="rounded-2xl"
           name="xpReward"
-          type="number"
           min="0"
           defaultValue={task?.xp_reward ?? 10}
           aria-label="XP reward"
         />
-        <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+        <NumberStepper
+          wrapperClassName="rounded-2xl"
           name="setCount"
-          type="number"
           min="0"
           max="10"
           defaultValue={task?.set_targets?.length ?? 0}

@@ -29,6 +29,12 @@ body {
 
 .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom) + 5.5rem); }
 .touch-card { @apply transition duration-200 active:scale-[0.98]; }
+.number-stepper-input { appearance: textfield; }
+.number-stepper-input::-webkit-inner-spin-button,
+.number-stepper-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
 .confetti-bg {
   background-image: radial-gradient(#22c55e 1.2px, transparent 1.2px), radial-gradient(#facc15 1.2px, transparent 1.2px);
   background-position: 0 0, 12px 12px;

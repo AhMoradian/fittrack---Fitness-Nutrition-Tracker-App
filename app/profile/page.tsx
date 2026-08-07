@@ -1,17 +1,27 @@
 'use client';
 
 import { useState } from 'react';
-import { Download, HardDrive, Save, Upload } from 'lucide-react';
+import Link from 'next/link';
+import { Cloud, CloudOff, Download, HardDrive, LogOut, Save, Upload } from 'lucide-react';
 import { ScreenHeader } from '@/components/app-shell';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { NumberStepper } from '@/components/ui/number-stepper';
 import { useFitTrack } from '@/lib/fittrack-store';
 import { adhdTips, programRules } from '@/lib/sample-data';
 import { latestMetric } from '@/lib/tracking';
 import type { FitTrackData, UserProfile } from '@/lib/types';
 
 export default function ProfilePage() {
-  const { data, saveProfile, importData } = useFitTrack();
+  const {
+    data,
+    saveProfile,
+    importData,
+    cloudConfigured,
+    userEmail,
+    syncStatus,
+    signOut,
+  } = useFitTrack();
   const [message, setMessage] = useState('');
   const currentMetric = latestMetric(data.body_metrics);
 
@@ -65,9 +75,48 @@ export default function ProfilePage() {
       <ScreenHeader
         eyebrow="Profile"
         title={data.profile.name ? `${data.profile.name}'s setup` : 'Your setup'}
-        subtitle="This is a private, single-user profile stored on your device."
+        subtitle={
+          userEmail
+            ? 'Your private progress is backed up and synced across your signed-in devices.'
+            : 'Your progress is private and currently stored on this device.'
+        }
       />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
+        <Card className={userEmail ? 'border-green-200 bg-green-50' : undefined}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              {userEmail ? (
+                <Cloud className="mt-1 h-7 w-7 text-green-600" />
+              ) : (
+                <CloudOff className="mt-1 h-7 w-7 text-slate-500" />
+              )}
+              <div>
+                <h2 className="text-xl font-black">
+                  {userEmail ? 'Cloud sync connected' : 'Connect your devices'}
+                </h2>
+                <p className="mt-1 text-sm font-bold text-muted-foreground">
+                  {userEmail
+                    ? `${userEmail} · ${syncStatus === 'saving' ? 'Saving changes…' : syncStatus === 'error' ? 'Sync needs attention' : 'All changes synced'}`
+                    : cloudConfigured
+                      ? 'Sign in with the same email on your phone and computer.'
+                      : 'Cloud sync is not configured yet; local saving still works.'}
+                </p>
+              </div>
+            </div>
+            {userEmail ? (
+              <Button type="button" variant="secondary" onClick={() => void signOut()}>
+                <LogOut className="h-5 w-5" /> Sign out
+              </Button>
+            ) : cloudConfigured ? (
+              <Button asChild>
+                <Link href="/login">
+                  <Cloud className="h-5 w-5" /> Enable sync
+                </Link>
+              </Button>
+            ) : null}
+          </div>
+        </Card>
+
         <Card className="bg-slate-950 text-white">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div className="grid h-20 w-20 place-items-center rounded-full bg-green-400 text-4xl">💪</div>
@@ -94,15 +143,25 @@ export default function ProfilePage() {
             ].map(([label, name, value, type]) => (
               <label key={name}>
                 <span className="mb-2 block text-sm font-bold">{label}</span>
-                <input
-                  className="w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100"
-                  name={name}
-                  type={type}
-                  step={type === 'number' ? '0.1' : undefined}
-                  defaultValue={value}
-                  disabled={name === 'currentWeight'}
-                  required={name !== 'currentWeight'}
-                />
+                {type === 'number' ? (
+                  <NumberStepper
+                    name={name}
+                    step="0.1"
+                    min="0"
+                    defaultValue={value}
+                    aria-label={label}
+                    required
+                  />
+                ) : (
+                  <input
+                    className="w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100"
+                    name={name}
+                    type={type}
+                    defaultValue={value}
+                    disabled={name === 'currentWeight'}
+                    required={name !== 'currentWeight'}
+                  />
+                )}
               </label>
             ))}
             <label className="sm:col-span-2">
@@ -140,7 +199,9 @@ export default function ProfilePage() {
           <HardDrive className="h-7 w-7 text-green-600" />
           <h2 className="mt-2 text-xl font-black">Your data</h2>
           <p className="mt-1 text-sm font-medium text-muted-foreground">
-            Browser storage is private and simple, but clearing browser data removes it. Export a backup regularly.
+            {userEmail
+              ? 'Cloud sync protects your progress, and a downloadable backup gives you an extra copy.'
+              : 'Browser storage is private and simple, but clearing browser data removes it. Export a backup regularly.'}
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
             <Button type="button" size="lg" onClick={exportData}>

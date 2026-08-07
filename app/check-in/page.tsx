@@ -5,6 +5,7 @@ import { CalendarCheck2, Clipboard, Save, Send } from 'lucide-react';
 import { ScreenHeader } from '@/components/app-shell';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { NumberStepper } from '@/components/ui/number-stepper';
 import { useFitTrack } from '@/lib/fittrack-store';
 import { localDateKey } from '@/lib/tracking';
 import type { WeeklyCheckIn } from '@/lib/types';
@@ -67,7 +68,7 @@ export default function CheckInPage() {
       wins: String(form.get('wins')).trim() || undefined,
       challenges: String(form.get('challenges')).trim() || undefined,
     });
-    setMessage('Weekly check-in saved on this device.');
+    setMessage('Weekly check-in saved.');
   };
 
   const copyLatest = async () => {
@@ -116,9 +117,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Average weight (kg)
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="averageWeight"
                     min="30"
                     max="200"
@@ -128,9 +128,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Average sleep (hours)
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="averageSleep"
                     min="0"
                     max="16"
@@ -140,9 +139,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Strength sessions
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="strengthSessions"
                     min="0"
                     max="3"
@@ -152,9 +150,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Skill sessions
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="skillSessions"
                     min="0"
                     max="2"
@@ -164,9 +161,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Nutrition target days
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="nutritionDays"
                     min="0"
                     max="7"
@@ -176,9 +172,8 @@ export default function CheckInPage() {
                 </label>
                 <label className="text-sm font-black">
                   Energy (1–5)
-                  <input
-                    className={fieldClass}
-                    type="number"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
                     name="energy"
                     min="1"
                     max="5"
@@ -200,9 +195,8 @@ export default function CheckInPage() {
                   ].map(([label, name]) => (
                     <label key={name} className="text-xs font-black">
                       {label}
-                      <input
-                        className={fieldClass}
-                        type="number"
+                      <NumberStepper
+                        wrapperClassName="mt-2"
                         name={name}
                         min="0"
                         step="1"

@@ -1,6 +1,6 @@
 # FitTrack Setup Guide
 
-FitTrack currently runs as a single-user, local-first application. No login, Supabase project, or environment variables are needed.
+FitTrack is local-first. No account is required for one-device use; Supabase enables private sync between a phone and computer.
 
 ## Start the app
 
@@ -21,9 +21,24 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 ## Where the data lives
 
-Records are saved in the current browser's local storage. They remain after refreshes and browser restarts, but they are specific to that browser and device.
+Records are always saved in the current browser's local storage. They remain after refreshes and browser restarts.
 
-To move to another browser or protect against accidental clearing:
+## Enable cross-device sync
+
+1. Create a Supabase project.
+2. Run `supabase/migrations/202608070001_fittrack_cloud_sync.sql` in the Supabase SQL editor. If this is a new project and you want the legacy relational tables too, run the initial migration first.
+3. Copy `.env.example` to `.env.local` and add the project URL and anonymous key.
+4. In **Supabase → Authentication → URL Configuration**, add the deployed site URL and `http://localhost:3000/auth/callback` while developing.
+5. Restart FitTrack, open **Profile → Enable sync**, and request a magic link.
+6. Sign in with the same email on the phone and computer.
+
+The first signed-in device uploads its existing local progress. Later devices load that cloud copy and receive realtime changes. Row-level security ensures each account can access only its own snapshot.
+
+The coaching chat does not automatically receive private health data. Use **Check-in → Copy latest summary** when you want to share results with your coach.
+
+## Manual backup
+
+To move data without cloud sync or keep an extra backup:
 
 1. Choose **Profile → Export backup**.
 2. Keep the downloaded JSON file somewhere safe.
@@ -37,5 +52,3 @@ npm run lint
 npm run build
 npm start
 ```
-
-The repository still contains a Supabase schema from the earlier multi-user architecture. It is not used by the current app.

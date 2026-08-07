@@ -61,7 +61,7 @@ export default function ProgressPage() {
     try {
       const imageUrl = await resizeImage(file);
       addPhoto({ date: today, image_url: imageUrl });
-      setPhotoMessage('Photo saved on this device.');
+      setPhotoMessage('Photo saved.');
     } catch {
       setPhotoMessage('Could not process that photo.');
     } finally {
@@ -100,7 +100,7 @@ export default function ProgressPage() {
           <Card>
             <Camera className="h-7 w-7 text-green-600" />
             <h2 className="mt-2 text-xl font-black">Progress photos</h2>
-            <p className="mt-1 text-sm font-medium text-muted-foreground">Photos are compressed and kept only in this browser.</p>
+            <p className="mt-1 text-sm font-medium text-muted-foreground">Photos are compressed and included in your private saved progress.</p>
             <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 font-black text-white">
               <Upload className="h-5 w-5" /> Add today’s photo
               <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
