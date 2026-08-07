@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Ruler, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { NumberStepper } from '@/components/ui/number-stepper';
 import { localDateKey } from '@/lib/tracking';
 import type { BodyMetric } from '@/lib/types';
 
@@ -66,13 +67,15 @@ export function WeightTracker({
           ].map(([label, value, setter]) => (
             <label key={label as string}>
               <span className="mb-2 block text-sm font-bold">{label as string}</span>
-              <input
-                type="number"
+              <NumberStepper
                 min="0"
                 step="0.1"
                 value={value as string}
+                aria-label={label as string}
+                onValueChange={(nextValue) =>
+                  (setter as React.Dispatch<React.SetStateAction<string>>)(nextValue)
+                }
                 onChange={(event) => (setter as React.Dispatch<React.SetStateAction<string>>)(event.target.value)}
-                className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500"
               />
             </label>
           ))}

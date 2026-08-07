@@ -8,6 +8,7 @@ import { percentage } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { NumberStepper } from '@/components/ui/number-stepper';
 
 const categoryStyles = {
   workout: 'bg-orange-100 text-orange-700',
@@ -101,12 +102,21 @@ export function TaskCard({
                       {set.note ?? `${set.target_value} ${set.target_unit}`}
                     </span>
                   </span>
-                  <input
-                    className="mt-2 w-full rounded-xl border px-3 py-2 text-base font-black outline-none focus:ring-2 focus:ring-green-500"
+                  <NumberStepper
+                    wrapperClassName="mt-2"
+                    className="text-base"
                     inputMode="decimal"
                     min="0"
-                    type="number"
+                    step="1"
+                    aria-label={`${set.label} completed`}
                     value={setValues[index] ?? 0}
+                    onValueChange={(nextValue) =>
+                      setSetValues((values) =>
+                        values.map((value, valueIndex) =>
+                          valueIndex === index ? Number(nextValue) : value,
+                        ),
+                      )
+                    }
                     onChange={(event) =>
                       setSetValues((values) =>
                         values.map((value, valueIndex) =>
@@ -126,19 +136,18 @@ export function TaskCard({
             <span className="text-xs font-black uppercase text-muted-foreground">
               Completed count
             </span>
-            <div className="mt-2 flex items-center gap-2 rounded-2xl border bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-green-500">
-              <input
-                className="min-w-0 flex-1 bg-transparent text-lg font-black outline-none"
-                inputMode="decimal"
-                min="0"
-                type="number"
-                value={singleValue}
-                onChange={(event) => setSingleValue(Number(event.target.value))}
-              />
-              <span className="text-sm font-black text-muted-foreground">
-                {task.target_unit}
-              </span>
-            </div>
+            <NumberStepper
+              wrapperClassName="mt-2 rounded-2xl"
+              className="text-lg"
+              inputMode="decimal"
+              min="0"
+              step={task.target_value < 10 ? '0.1' : '1'}
+              value={singleValue}
+              suffix={task.target_unit}
+              aria-label={`Completed ${task.target_unit}`}
+              onValueChange={(nextValue) => setSingleValue(Number(nextValue))}
+              onChange={(event) => setSingleValue(Number(event.target.value))}
+            />
           </label>
         )}
 
@@ -184,7 +193,7 @@ export function TaskCard({
         </div>
         {saved ? (
           <p className="text-xs font-bold text-green-700">
-            Saved on this device.
+            Progress saved.
           </p>
         ) : null}
       </form>

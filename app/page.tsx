@@ -40,7 +40,7 @@ const planDayNames: Record<number, string> = {
 };
 
 export default function TodayPage() {
-  const { data, saveLog, ready } = useFitTrack();
+  const { data, saveLog, ready, userEmail } = useFitTrack();
   const today = localDateKey();
   const todayTasks = tasksForDate(data.tasks, today);
   const summary = getDailySummary(data.tasks, data.daily_logs, today);
@@ -57,7 +57,7 @@ export default function TodayPage() {
       <ScreenHeader
         eyebrow={dateLabel}
         title="Win the day"
-        subtitle={`Plan Day ${planDay}: ${planDayNames[planDay]}. Your progress is private and saved on this device.`}
+        subtitle={`Plan Day ${planDay}: ${planDayNames[planDay]}. ${userEmail ? 'Your progress is synced across your devices.' : 'Your progress is private and saved on this device.'}`}
       />
 
       {!ready ? (
