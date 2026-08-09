@@ -85,8 +85,8 @@ export default function CheckInPage() {
     <div>
       <ScreenHeader
         eyebrow="Weekly Check-in"
-        title="Give your coach useful evidence"
-        subtitle="Complete this once each Sunday. Copy the summary into your coaching chat so the next plan is based on results, not guesses."
+        title="Fill the gaps from your daily logs"
+        subtitle="Complete this once each Sunday. Your scheduled coach reads the synced week, analyzes it, and publishes the next plan automatically."
       />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
         <div className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
@@ -234,10 +234,10 @@ export default function CheckInPage() {
           <div className="space-y-4">
             <Card className="bg-slate-950 text-white">
               <Send className="h-7 w-7 text-green-300" />
-              <h2 className="mt-3 text-xl font-black">Send it to your coach</h2>
+              <h2 className="mt-3 text-xl font-black">Automatic coach review</h2>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-300">
-                The app stays private in your browser and does not send health data
-                automatically. Copy the summary and paste it into this chat.
+                Your Sunday task reads the synced daily logs and this check-in.
+                Use the copy button only as a manual backup.
               </p>
               <Button
                 type="button"
@@ -245,7 +245,7 @@ export default function CheckInPage() {
                 disabled={!latest}
                 onClick={copyLatest}
               >
-                <Clipboard className="h-5 w-5" /> Copy latest summary
+                <Clipboard className="h-5 w-5" /> Copy backup summary
               </Button>
               {message ? (
                 <p className="mt-3 text-sm font-bold text-green-200">{message}</p>

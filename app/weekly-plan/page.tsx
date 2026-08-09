@@ -7,7 +7,7 @@ import { TaskEditor } from '@/components/task-editor';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useFitTrack } from '@/lib/fittrack-store';
-import { coachPlan, programRules } from '@/lib/sample-data';
+import { programRules } from '@/lib/sample-data';
 import type { Task } from '@/lib/types';
 
 const dayNames: Record<number, string> = {
@@ -67,6 +67,7 @@ function TaskRow({
 
 export default function WeeklyPlanPage() {
   const { data, saveTask, deleteTask } = useFitTrack();
+  const coachPlan = data.coach_plan;
   const [editingTask, setEditingTask] = useState<Task>();
   const days = Array.from({ length: 7 }, (_, index) => index + 1);
   const dailyTasks = data.tasks
@@ -104,8 +105,8 @@ export default function WeeklyPlanPage() {
             </span>
           </div>
           <p className="mt-3 text-xs font-bold text-muted-foreground">
-            New coach-plan versions install automatically while your logs,
-            measurements, photos, check-ins, and custom tasks stay intact.
+            Your Sunday coach review can publish a new version automatically.
+            Older plans, logs, measurements, check-ins, and custom tasks stay intact.
           </p>
         </Card>
 

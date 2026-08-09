@@ -13,6 +13,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import {
   COACH_PLAN_VERSION,
   COACH_PROGRAM_ID,
+  coachPlan,
   profile as starterProfile,
   tasks as starterTasks,
 } from '@/lib/sample-data';
@@ -32,7 +33,8 @@ const STORAGE_KEY = 'fittrack-single-user-v1';
 const CLOUD_TABLE = 'fittrack_data';
 const cloudConfigured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
 );
 
 export type SyncStatus =
@@ -45,11 +47,19 @@ export type SyncStatus =
 function createStarterData(): FitTrackData {
   const today = localDateKey();
   const weight = Number.parseFloat(starterProfile.weight);
+  const starterCoachTasks = starterTasks.map((task) => ({ ...task }));
   return {
     version: 1,
     started_at: today,
     coach_plan_version: COACH_PLAN_VERSION,
-    tasks: starterTasks.map((task) => ({ ...task })),
+    coach_plan: { ...coachPlan },
+    coach_plan_history: [
+      {
+        ...coachPlan,
+        tasks: starterCoachTasks.map((task) => ({ ...task })),
+      },
+    ],
+    tasks: starterCoachTasks,
     daily_logs: [],
     body_metrics: Number.isFinite(weight)
       ? [
@@ -75,19 +85,48 @@ function createStarterData(): FitTrackData {
 }
 
 function normalizeData(parsed: FitTrackData): FitTrackData {
-  const needsCoachUpdate = parsed.coach_plan_version !== COACH_PLAN_VERSION;
-  const nonCoachTasks = parsed.tasks.filter(
+  const parsedTasks = Array.isArray(parsed.tasks) ? parsed.tasks : [];
+  const parsedCoachVersion = Number.isFinite(parsed.coach_plan_version)
+    ? parsed.coach_plan_version
+    : 0;
+  const needsBaselineUpdate = parsedCoachVersion < COACH_PLAN_VERSION;
+  const nonCoachTasks = parsedTasks.filter(
     (task) =>
       task.program_id !== COACH_PROGRAM_ID &&
       task.program_id !== 'home-muscle-building-program',
   );
+  const tasks = needsBaselineUpdate
+    ? [...nonCoachTasks, ...starterTasks.map((task) => ({ ...task }))]
+    : parsedTasks;
+  const coachPlanVersion = needsBaselineUpdate
+    ? COACH_PLAN_VERSION
+    : parsedCoachVersion;
+  const activeCoachPlan = needsBaselineUpdate
+    ? { ...coachPlan }
+    : parsed.coach_plan ?? {
+        ...coachPlan,
+        version: coachPlanVersion,
+        phase: `Coach plan v${coachPlanVersion}`,
+      };
+  const history = Array.isArray(parsed.coach_plan_history)
+    ? [...parsed.coach_plan_history]
+    : [];
+
+  if (!history.some((entry) => entry.version === activeCoachPlan.version)) {
+    history.push({
+      ...activeCoachPlan,
+      tasks: tasks
+        .filter((task) => task.program_id === COACH_PROGRAM_ID)
+        .map((task) => ({ ...task })),
+    });
+  }
 
   return {
     ...parsed,
-    coach_plan_version: COACH_PLAN_VERSION,
-    tasks: needsCoachUpdate
-      ? [...nonCoachTasks, ...starterTasks.map((task) => ({ ...task }))]
-      : parsed.tasks,
+    coach_plan_version: coachPlanVersion,
+    coach_plan: activeCoachPlan,
+    coach_plan_history: history.sort((a, b) => a.version - b.version),
+    tasks,
     weekly_check_ins: parsed.weekly_check_ins ?? [],
   };
 }

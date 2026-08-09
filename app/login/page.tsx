@@ -10,7 +10,8 @@ import { createClient } from '@/lib/supabase/client';
 
 const cloudConfigured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
 );
 
 export default function LoginPage() {
@@ -88,7 +89,7 @@ export default function LoginPage() {
             </form>
           ) : (
             <div className="mt-6 rounded-2xl bg-yellow-50 p-4 text-sm font-bold text-yellow-900">
-              Cloud sync needs the Supabase URL and anonymous key configured on
+              Cloud sync needs the Supabase URL and publishable key configured on
               the server. Your local tracker will keep working until then.
             </div>
           )}

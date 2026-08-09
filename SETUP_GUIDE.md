@@ -34,7 +34,7 @@ Records are always saved in the current browser's local storage. They remain aft
 
 The first signed-in device uploads its existing local progress. Later devices load that cloud copy and receive realtime changes. Row-level security ensures each account can access only its own snapshot.
 
-The coaching chat does not automatically receive private health data. Use **Check-in → Copy latest summary** when you want to share results with your coach.
+When the project-scoped coaching automation is connected, it reads the synced seven-day records and Sunday check-in, publishes the next versioned plan, verifies it, and reports the coaching analysis in the linked thread. **Check-in → Copy backup summary** remains available as a fallback.
 
 ## Manual backup
 
