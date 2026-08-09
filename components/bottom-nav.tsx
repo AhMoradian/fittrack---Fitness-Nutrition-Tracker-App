@@ -10,6 +10,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FitTrackLogo } from '@/components/app-shell';
 
 const items = [
   { href: '/', label: 'Today', icon: CalendarDays },
@@ -39,7 +40,7 @@ export function BottomNav() {
       </nav>
       <nav className="sticky top-0 z-40 hidden border-b bg-white/80 px-8 py-3 backdrop-blur md:block">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-          <Link href="/" className="text-lg font-black text-green-700">FitTrack</Link>
+          <FitTrackLogo />
           <div className="flex gap-2">
             {items.map((item) => {
               const active = pathname === item.href;
