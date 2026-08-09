@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export function FitTrackLogo() {
   return (
-    <Link href="/" aria-label="FitTrack home" className="inline-flex shrink-0 items-center">
+    <Link href="/" aria-label="FitTrack home" className="inline-flex shrink-0 items-center" data-motion-header-part>
       <span className="relative block h-8 w-32 overflow-hidden" aria-hidden="true">
         <Image
           src="/fittrack-wordmark.png"
@@ -19,17 +19,17 @@ export function FitTrackLogo() {
 
 export function ScreenHeader({ eyebrow, title, subtitle, action }: { eyebrow: string; title: string; subtitle: string; action?: React.ReactNode }) {
   return (
-    <header className="px-5 pb-4 pt-7 md:px-8">
+    <header className="px-5 pb-4 pt-7 md:px-8" data-motion-header>
       <div className="mb-6 md:hidden">
         <FitTrackLogo />
       </div>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="mb-1 text-sm font-black uppercase tracking-[0.22em] text-green-600">{eyebrow}</p>
-          <h1 className="text-3xl font-black tracking-tight md:text-4xl">{title}</h1>
-          <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-muted-foreground">{subtitle}</p>
+          <p className="mb-1 text-sm font-black uppercase tracking-[0.22em] text-green-600" data-motion-header-part>{eyebrow}</p>
+          <h1 className="text-3xl font-black tracking-tight md:text-4xl" data-motion-header-part>{title}</h1>
+          <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-muted-foreground" data-motion-header-part>{subtitle}</p>
         </div>
-        {action}
+        {action ? <div data-motion-header-part>{action}</div> : null}
       </div>
     </header>
   );
