@@ -34,27 +34,23 @@ export function BottomNav() {
   useGSAP(
     () => {
       const root = navRootRef.current;
-      if (!root) return;
+      if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
 
       const activeLinks = root.querySelectorAll<HTMLElement>('[data-nav-active="true"]');
       const activeIcons = root.querySelectorAll<SVGElement>('[data-nav-active="true"] [data-nav-icon]');
-      const media = gsap.matchMedia();
-
-      media.add('(prefers-reduced-motion: no-preference)', () => {
-        const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
-        timeline
-          .fromTo(activeLinks, { scale: 0.92 }, { scale: 1, duration: 0.35 })
-          .fromTo(
-            activeIcons,
-            { y: 3, rotation: -8, scale: 0.85 },
-            { y: 0, rotation: 0, scale: 1, duration: 0.42, stagger: 0.03 },
-            '<',
-          );
-      });
-
-      return () => media.revert();
+      const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      timeline
+        .fromTo(activeLinks, { scale: 0.92 }, { scale: 1, duration: 0.35 })
+        .fromTo(
+          activeIcons,
+          { y: 3, rotation: -8, scale: 0.85 },
+          { y: 0, rotation: 0, scale: 1, duration: 0.42, stagger: 0.03 },
+          '<',
+        );
     },
-    { scope: navRootRef, dependencies: [pathname], revertOnUpdate: true },
+    { dependencies: [pathname], revertOnUpdate: true },
   );
 
   return (

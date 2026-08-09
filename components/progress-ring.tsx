@@ -20,42 +20,37 @@ export function ProgressRing({ value, label, className }: { value: number; label
       const valueElement = valueRef.current;
       if (!ring || !valueElement) return;
 
-      const media = gsap.matchMedia();
-      media.add('(prefers-reduced-motion: no-preference)', () => {
-        const counter = { value: 0 };
-        const timeline = gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } });
-
-        timeline
-          .fromTo(
-            ring,
-            { '--progress-angle': '0deg', rotation: -4, scale: 0.94 },
-            {
-              '--progress-angle': `${clamped * 3.6}deg`,
-              rotation: 0,
-              scale: 1,
-            },
-            0,
-          )
-          .to(
-            counter,
-            {
-              value: clamped,
-              onUpdate: () => {
-                valueElement.textContent = `${Math.round(counter.value)}%`;
-              },
-            },
-            0,
-          );
-      });
-
-      media.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set(ring, { '--progress-angle': `${clamped * 3.6}deg` });
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         valueElement.textContent = `${clamped}%`;
-      });
+        return;
+      }
 
-      return () => media.revert();
+      const counter = { value: 0 };
+      const timeline = gsap.timeline({ defaults: { duration: 0.9, ease: 'power3.out' } });
+
+      timeline
+        .fromTo(
+          ring,
+          { '--progress-angle': '0deg', rotation: -4, scale: 0.94 },
+          {
+            '--progress-angle': `${clamped * 3.6}deg`,
+            rotation: 0,
+            scale: 1,
+          },
+          0,
+        )
+        .to(
+          counter,
+          {
+            value: clamped,
+            onUpdate: () => {
+              valueElement.textContent = `${Math.round(counter.value)}%`;
+            },
+          },
+          0,
+        );
     },
-    { scope: ringRef, dependencies: [clamped], revertOnUpdate: true },
+    { dependencies: [clamped], revertOnUpdate: true },
   );
 
   return (
