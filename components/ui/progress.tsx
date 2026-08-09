@@ -19,20 +19,15 @@ export function Progress({ value = 0, className, indicatorClassName }: { value?:
       const indicator = indicatorRef.current;
       if (!indicator) return;
 
-      const media = gsap.matchMedia();
-      media.add('(prefers-reduced-motion: no-preference)', () => {
-        gsap.fromTo(
-          indicator,
-          { xPercent: -100 },
-          { xPercent: clamped - 100, duration: 0.7, ease: 'power3.out' },
-        );
-      });
-      media.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set(indicator, { xPercent: clamped - 100 });
-      });
-      return () => media.revert();
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      gsap.fromTo(
+        indicator,
+        { xPercent: -100 },
+        { xPercent: clamped - 100, duration: 0.7, ease: 'power3.out' },
+      );
     },
-    { scope: indicatorRef, dependencies: [clamped], revertOnUpdate: true },
+    { dependencies: [clamped], revertOnUpdate: true },
   );
 
   return (
