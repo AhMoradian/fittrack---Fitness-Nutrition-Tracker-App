@@ -33,7 +33,8 @@ const STORAGE_KEY = 'fittrack-single-user-v1';
 const CLOUD_TABLE = 'fittrack_data';
 const cloudConfigured = Boolean(
   process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
 );
 
 export type SyncStatus =
