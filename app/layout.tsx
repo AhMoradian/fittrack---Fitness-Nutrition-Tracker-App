@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { BottomNav } from '@/components/bottom-nav';
+import { AppMotion } from '@/components/app-motion';
 import { FitTrackProvider } from '@/lib/fittrack-store';
 
 export const metadata: Metadata = {
@@ -21,7 +22,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-screen font-sans">
         <FitTrackProvider>
           <BottomNav />
-          <main className="mx-auto min-h-screen w-full max-w-md safe-bottom md:max-w-6xl">{children}</main>
+          <main className="mx-auto min-h-screen w-full max-w-md safe-bottom md:max-w-6xl">
+            <AppMotion>{children}</AppMotion>
+          </main>
         </FitTrackProvider>
       </body>
     </html>
