@@ -10,16 +10,19 @@ ALTER TABLE public.fittrack_data ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can read their own FitTrack data"
   ON public.fittrack_data FOR SELECT
-  USING (auth.uid() = user_id);
+  TO authenticated
+  USING ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can insert their own FitTrack data"
   ON public.fittrack_data FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  TO authenticated
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 CREATE POLICY "Users can update their own FitTrack data"
   ON public.fittrack_data FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  TO authenticated
+  USING ((SELECT auth.uid()) = user_id)
+  WITH CHECK ((SELECT auth.uid()) = user_id);
 
 GRANT SELECT, INSERT, UPDATE ON public.fittrack_data TO authenticated;
 

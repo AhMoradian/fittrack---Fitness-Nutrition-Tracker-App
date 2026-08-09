@@ -151,19 +151,23 @@ export function TaskCard({
           </label>
         )}
 
-        {task.category === 'nutrition' ? (
-          <label className="block">
-            <span className="text-xs font-black uppercase text-muted-foreground">
-              Nutrition notes
-            </span>
-            <textarea
-              className="mt-2 min-h-20 w-full rounded-2xl border px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-green-500"
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              placeholder="Example: rice + chicken, extra banana, more water…"
-            />
-          </label>
-        ) : null}
+        <label className="block">
+          <span className="text-xs font-black uppercase text-muted-foreground">
+            Optional quick note
+          </span>
+          <textarea
+            className="mt-2 min-h-16 w-full rounded-2xl border px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-green-500"
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder={
+              task.category === 'nutrition'
+                ? 'Food, appetite, or digestion...'
+                : task.category === 'workout'
+                  ? 'Difficulty, reps left, pain, or substitution...'
+                  : 'Energy, sleep, pain, steps, or anything unusual...'
+            }
+          />
+        </label>
 
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-center">
           <div>

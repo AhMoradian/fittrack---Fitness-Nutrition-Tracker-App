@@ -111,10 +111,24 @@ export type WeeklyCheckIn = {
   created_at: string;
 };
 
+export type CoachPlanDetails = {
+  version: number;
+  updatedAt: string;
+  phase: string;
+  focus: string;
+  nutrition: string;
+};
+
+export type CoachPlanSnapshot = CoachPlanDetails & {
+  tasks: Task[];
+};
+
 export type FitTrackData = {
   version: 1;
   started_at: string;
   coach_plan_version: number;
+  coach_plan: CoachPlanDetails;
+  coach_plan_history: CoachPlanSnapshot[];
   tasks: Task[];
   daily_logs: DailyLog[];
   body_metrics: BodyMetric[];
