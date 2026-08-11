@@ -6,7 +6,7 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useFitTrack } from '@/lib/fittrack-store';
 
-const MINIMUM_VISIBLE_MS = 700;
+const MINIMUM_VISIBLE_MS = 1250;
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(useGSAP);
@@ -37,10 +37,6 @@ export function AppLoadingOverlay() {
       const glow = overlay.querySelector<HTMLElement>('[data-loader-glow]');
       const orbit = overlay.querySelector<HTMLElement>('[data-loader-orbit]');
       const streak = overlay.querySelector<HTMLElement>('[data-loader-streak]');
-      const label = overlay.querySelector<HTMLElement>('[data-loader-label]');
-      const progress = overlay.querySelector<HTMLElement>(
-        '[data-loader-progress]',
-      );
       const sparks = overlay.querySelectorAll<HTMLElement>(
         '[data-loader-spark]',
       );
@@ -51,9 +47,7 @@ export function AppLoadingOverlay() {
         !track ||
         !glow ||
         !orbit ||
-        !streak ||
-        !label ||
-        !progress
+        !streak
       ) {
         return;
       }
@@ -81,7 +75,7 @@ export function AppLoadingOverlay() {
               x: -18,
               rotation: -1.5,
               autoAlpha: 0.72,
-              duration: 0.18,
+              duration: 0.26,
               ease: 'power2.in',
             },
             0,
@@ -92,7 +86,7 @@ export function AppLoadingOverlay() {
               x: 18,
               rotation: 1.5,
               autoAlpha: 0.72,
-              duration: 0.18,
+              duration: 0.26,
               ease: 'power2.in',
             },
             0,
@@ -102,7 +96,7 @@ export function AppLoadingOverlay() {
             {
               scale: 1.18,
               autoAlpha: 0,
-              duration: 0.24,
+              duration: 0.34,
               ease: 'power2.in',
             },
             0,
@@ -111,10 +105,10 @@ export function AppLoadingOverlay() {
             overlay,
             {
               autoAlpha: 0,
-              duration: 0.3,
+              duration: 0.42,
               ease: 'power2.inOut',
             },
-            0.1,
+            0.14,
           );
 
         return () => exitTimeline.kill();
@@ -124,7 +118,7 @@ export function AppLoadingOverlay() {
       gsap.set(overlay, { autoAlpha: 1 });
 
       if (reduceMotion) {
-        gsap.set([mark, fit, track, label], { autoAlpha: 1 });
+        gsap.set([mark, fit, track], { autoAlpha: 1 });
         gsap.set([orbit, glow], { autoAlpha: 0 });
         return;
       }
@@ -135,13 +129,13 @@ export function AppLoadingOverlay() {
         .fromTo(
           glow,
           { autoAlpha: 0, scale: 0.45 },
-          { autoAlpha: 0.78, scale: 1, duration: 0.5 },
+          { autoAlpha: 0.78, scale: 1, duration: 0.72 },
           'assemble',
         )
         .fromTo(
           streak,
           { autoAlpha: 0, scaleX: 0.08 },
-          { autoAlpha: 0.75, scaleX: 1, duration: 0.42 },
+          { autoAlpha: 0.75, scaleX: 1, duration: 0.62 },
           'assemble',
         )
         .fromTo(
@@ -153,8 +147,8 @@ export function AppLoadingOverlay() {
             y: 0,
             rotation: 0,
             scale: 1,
-            duration: 0.46,
-            ease: 'back.out(1.8)',
+            duration: 0.7,
+            ease: 'back.out(1.55)',
           },
           'assemble',
         )
@@ -167,20 +161,20 @@ export function AppLoadingOverlay() {
             y: 0,
             rotation: 0,
             scale: 1,
-            duration: 0.5,
-            ease: 'back.out(1.8)',
+            duration: 0.76,
+            ease: 'back.out(1.55)',
           },
-          'assemble+=0.04',
+          'assemble+=0.06',
         )
-        .addLabel('lock', 0.42)
+        .addLabel('lock', 0.68)
         .to(
           mark,
-          { scale: 1.045, duration: 0.09, ease: 'power2.out' },
+          { scale: 1.045, duration: 0.14, ease: 'power2.out' },
           'lock',
         )
         .to(
           mark,
-          { scale: 1, duration: 0.2, ease: 'back.out(2.4)' },
+          { scale: 1, duration: 0.3, ease: 'back.out(2.2)' },
           '>',
         )
         .fromTo(
@@ -190,8 +184,8 @@ export function AppLoadingOverlay() {
             autoAlpha: 1,
             scale: 1,
             rotation: 0,
-            duration: 0.16,
-            stagger: 0.035,
+            duration: 0.22,
+            stagger: 0.05,
             ease: 'back.out(2.6)',
           },
           'lock',
@@ -201,61 +195,38 @@ export function AppLoadingOverlay() {
           {
             autoAlpha: 0,
             scale: 1.7,
-            duration: 0.22,
-            stagger: 0.035,
+            duration: 0.3,
+            stagger: 0.05,
             ease: 'power2.out',
           },
-          'lock+=0.16',
-        )
-        .fromTo(
-          label,
-          { autoAlpha: 0, y: 7 },
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.3,
-          },
-          'lock+=0.04',
+          'lock+=0.22',
         )
         .to(
           streak,
-          { autoAlpha: 0, scaleX: 0.65, duration: 0.28 },
-          'lock+=0.05',
+          { autoAlpha: 0, scaleX: 0.65, duration: 0.4 },
+          'lock+=0.08',
         );
 
       const idle = gsap.to(mark, {
         y: -2,
         scale: 1.012,
-        duration: 0.78,
-        delay: 0.68,
+        duration: 0.95,
+        delay: 1.05,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
       });
       const orbitSpin = gsap.to(orbit, {
         rotation: 360,
-        duration: 2.6,
-        delay: 0.25,
+        duration: 3.4,
+        delay: 0.4,
         repeat: -1,
         ease: 'none',
       });
-      const progressSweep = gsap.fromTo(
-        progress,
-        { xPercent: -125, scaleX: 0.28 },
-        {
-          xPercent: 125,
-          scaleX: 0.52,
-          duration: 0.78,
-          repeat: -1,
-          ease: 'power1.inOut',
-        },
-      );
-
       return () => {
         introTimeline.kill();
         idle.kill();
         orbitSpin.kill();
-        progressSweep.kill();
       };
     },
     {
@@ -270,13 +241,14 @@ export function AppLoadingOverlay() {
       ref={overlayRef}
       role="status"
       aria-live="polite"
+      aria-label="Loading FitTrack"
       aria-hidden={shouldExit}
       className="fixed inset-0 z-[100] grid place-items-center overflow-hidden bg-slate-50"
     >
       <div className="absolute -left-20 -top-24 h-72 w-72 rounded-full bg-green-200/60 blur-3xl" />
       <div className="absolute -bottom-24 -right-16 h-64 w-64 rounded-full bg-yellow-200/50 blur-3xl" />
 
-      <div className="relative flex flex-col items-center">
+      <div className="relative grid place-items-center">
         <div className="relative grid h-36 w-[22rem] place-items-center sm:w-96">
           <span
             data-loader-glow
@@ -332,18 +304,6 @@ export function AppLoadingOverlay() {
           </span>
         </div>
 
-        <div className="h-1 w-40 overflow-hidden rounded-full bg-slate-200">
-          <span
-            data-loader-progress
-            className="block h-full w-full origin-left rounded-full bg-[#16A44B] will-change-transform"
-          />
-        </div>
-        <p
-          data-loader-label
-          className="mt-4 text-xs font-black uppercase tracking-[0.24em] text-slate-600"
-        >
-          Loading your momentum
-        </p>
       </div>
     </div>
   );
