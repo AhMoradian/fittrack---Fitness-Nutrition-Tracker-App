@@ -1,6 +1,6 @@
 # FitTrack logo design QA
 
-source visual truth path: `E:\project\fittrack\public\fittrack-wordmark.png` (refined selected wordmark asset; original selected reference: `C:\Users\Academy-karamuzi\.codex\generated_images\019fe73c-9c4b-7ad2-b4cc-90ca6a96abac\exec-a9c22313-4ecf-48b4-bc7c-6a548783181d.png`)
+source visual truth path: `E:\project\fittrack\public\fittrack-wordmark.svg` (vectorized production wordmark; PNG fallback: `E:\project\fittrack\public\fittrack-wordmark.png`; original selected reference: `C:\Users\Academy-karamuzi\.codex\generated_images\019fe73c-9c4b-7ad2-b4cc-90ca6a96abac\exec-a9c22313-4ecf-48b4-bc7c-6a548783181d.png`)
 
 implementation screenshot path: `E:\project\fittrack\design-qa-desktop.png`, `E:\project\fittrack\design-qa-mobile.png`
 

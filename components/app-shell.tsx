@@ -6,7 +6,7 @@ export function FitTrackLogo() {
     <Link href="/" aria-label="FitTrack home" className="inline-flex shrink-0 items-center" data-motion-header-part>
       <span className="relative block h-8 w-32 overflow-hidden" aria-hidden="true">
         <Image
-          src="/fittrack-wordmark.png"
+          src="/fittrack-wordmark.svg"
           alt=""
           width={144}
           height={144}
