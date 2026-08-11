@@ -25,7 +25,7 @@ export function ScreenHeader({ eyebrow, title, subtitle, action }: { eyebrow: st
       </div>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="mb-1 text-sm font-black uppercase tracking-[0.22em] text-green-600" data-motion-header-part>{eyebrow}</p>
+          <p className="mb-1 text-sm font-black uppercase tracking-[0.22em] text-teal-700" data-motion-header-part>{eyebrow}</p>
           <h1 className="text-3xl font-black tracking-tight md:text-4xl" data-motion-header-part>{title}</h1>
           <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-muted-foreground" data-motion-header-part>{subtitle}</p>
         </div>
