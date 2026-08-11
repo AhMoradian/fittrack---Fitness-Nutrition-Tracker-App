@@ -81,7 +81,7 @@ export function TaskCard({
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-black">{task.title}</h3>
               {done ? (
-                <CheckCircle2 className="h-5 w-5 fill-teal-600 text-white" />
+                <CheckCircle2 className="h-5 w-5 fill-green-500 text-white" />
               ) : null}
             </div>
             <p className="mt-1 text-xs font-bold text-muted-foreground">
@@ -172,7 +172,7 @@ export function TaskCard({
             Optional quick note
           </span>
           <textarea
-            className="mt-2 min-h-16 w-full rounded-2xl border px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-teal-600"
+            className="mt-2 min-h-16 w-full rounded-2xl border px-3 py-2 text-sm font-medium outline-none focus:ring-2 focus:ring-green-500"
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             placeholder={
@@ -189,7 +189,7 @@ export function TaskCard({
           <div>
             <Progress
               value={progress}
-              indicatorClassName={done ? 'bg-teal-600' : 'bg-yellow-400'}
+              indicatorClassName={done ? 'bg-green-500' : 'bg-yellow-400'}
             />
             <div className="mt-2 flex justify-between text-xs font-bold text-muted-foreground">
               <span>
@@ -212,7 +212,7 @@ export function TaskCard({
           </Button>
         </div>
         {saved ? (
-          <p className="text-xs font-bold text-teal-800">
+          <p className="text-xs font-bold text-green-700">
             Progress saved.
           </p>
         ) : null}
