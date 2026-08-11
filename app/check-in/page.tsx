@@ -16,7 +16,7 @@ const optionalNumber = (value: FormDataEntryValue | null) => {
 };
 
 const fieldClass =
-  'mt-2 w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600';
+  'mt-2 w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500';
 
 function coachSummary(checkIn: WeeklyCheckIn) {
   return [
@@ -92,7 +92,7 @@ export default function CheckInPage() {
         <div className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
           <Card>
             <div className="flex items-start gap-3">
-              <CalendarCheck2 className="mt-1 h-7 w-7 text-teal-700" />
+              <CalendarCheck2 className="mt-1 h-7 w-7 text-green-600" />
               <div>
                 <h2 className="text-xl font-black">Sunday review</h2>
                 <p className="mt-1 text-sm font-medium text-muted-foreground">
@@ -233,7 +233,7 @@ export default function CheckInPage() {
 
           <div className="space-y-4">
             <Card className="bg-slate-950 text-white">
-              <Send className="h-7 w-7 text-teal-300" />
+              <Send className="h-7 w-7 text-green-300" />
               <h2 className="mt-3 text-xl font-black">Automatic coach review</h2>
               <p className="mt-2 text-sm font-medium leading-6 text-slate-300">
                 Your Sunday task reads the synced daily logs and this check-in.
@@ -248,7 +248,7 @@ export default function CheckInPage() {
                 <Clipboard className="h-5 w-5" /> Copy backup summary
               </Button>
               {message ? (
-                <p className="mt-3 text-sm font-bold text-teal-200">{message}</p>
+                <p className="mt-3 text-sm font-bold text-green-200">{message}</p>
               ) : null}
             </Card>
 
@@ -262,7 +262,7 @@ export default function CheckInPage() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span>{checkIn.week_ending}</span>
-                      <span className="text-teal-800">
+                      <span className="text-green-700">
                         {checkIn.average_weight ?? '—'} kg
                       </span>
                     </div>

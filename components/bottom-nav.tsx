@@ -61,7 +61,7 @@ export function BottomNav() {
             const active = pathname === item.href;
             const Icon = item.icon;
             return (
-              <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined} data-nav-active={active} className={cn('flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-bold text-muted-foreground transition', active && 'bg-teal-100 text-teal-800')}>
+              <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined} data-nav-active={active} className={cn('flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-bold text-muted-foreground transition', active && 'bg-green-100 text-green-700')}>
                 <Icon className="h-5 w-5" data-nav-icon />
                 {item.label}
               </Link>
@@ -77,7 +77,7 @@ export function BottomNav() {
               const active = pathname === item.href;
               const Icon = item.icon;
               return (
-                <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined} data-nav-active={active} className={cn('flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-muted-foreground transition hover:bg-teal-50 hover:text-teal-800', active && 'bg-teal-100 text-teal-800')}>
+                <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined} data-nav-active={active} className={cn('flex items-center gap-2 rounded-full px-4 py-2 text-sm font-black text-muted-foreground transition hover:bg-green-50 hover:text-green-700', active && 'bg-green-100 text-green-700')}>
                   <Icon className="h-4 w-4" data-nav-icon />
                   {item.label}
                 </Link>

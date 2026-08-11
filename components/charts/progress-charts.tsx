@@ -47,8 +47,8 @@ export function ProgressCharts({
           <AreaChart data={trendData}>
             <defs>
               <linearGradient id="completion" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="5%" stopColor="#007173" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="#007173" stopOpacity={0} />
+                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.5} />
+                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />

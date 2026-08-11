@@ -54,7 +54,7 @@ export default function LoginPage() {
       <section className="px-4 sm:px-5 md:px-8">
         <Card className="mx-auto max-w-xl">
           <div className="flex items-center gap-3">
-            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-teal-100 text-teal-800">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-green-100 text-green-700">
               <Cloud className="h-6 w-6" />
             </span>
             <div>
@@ -69,7 +69,7 @@ export default function LoginPage() {
             <form onSubmit={sendMagicLink} className="mt-6 space-y-3">
               <label className="block text-sm font-black">
                 Email address
-                <div className="mt-2 flex items-center gap-2 rounded-2xl border bg-white px-4 focus-within:ring-2 focus-within:ring-teal-600">
+                <div className="mt-2 flex items-center gap-2 rounded-2xl border bg-white px-4 focus-within:ring-2 focus-within:ring-green-500">
                   <Mail className="h-5 w-5 text-muted-foreground" />
                   <input
                     className="min-w-0 flex-1 bg-transparent py-3 font-bold outline-none"
@@ -95,7 +95,7 @@ export default function LoginPage() {
           )}
 
           {message ? (
-            <p className="mt-4 rounded-2xl bg-teal-50 p-3 text-sm font-bold text-teal-900">
+            <p className="mt-4 rounded-2xl bg-green-50 p-3 text-sm font-bold text-green-800">
               {message}
             </p>
           ) : null}

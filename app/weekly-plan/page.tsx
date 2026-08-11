@@ -50,7 +50,7 @@ function TaskRow({
           <p className="mt-1 text-xs font-medium leading-5 text-slate-600">{task.description}</p>
         ) : null}
         {task.set_targets?.length ? (
-          <p className="mt-1 text-xs font-black text-teal-800">{task.set_targets.length} sets</p>
+          <p className="mt-1 text-xs font-black text-green-700">{task.set_targets.length} sets</p>
         ) : null}
       </div>
       <div className="flex gap-1">
@@ -89,10 +89,10 @@ export default function WeeklyPlanPage() {
         subtitle="Edit the plan whenever your exercises, equipment, or nutrition routine changes."
       />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
-        <Card className="border-teal-200 bg-teal-50">
+        <Card className="border-green-200 bg-green-50">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-black uppercase text-teal-800">
+              <p className="text-xs font-black uppercase text-green-700">
                 Coach plan v{coachPlan.version} · Updated {coachPlan.updatedAt}
               </p>
               <h2 className="mt-1 text-xl font-black">{coachPlan.phase}</h2>
@@ -100,7 +100,7 @@ export default function WeeklyPlanPage() {
                 {coachPlan.focus}
               </p>
             </div>
-            <span className="w-fit rounded-2xl bg-white px-4 py-3 text-sm font-black text-teal-900 shadow-sm">
+            <span className="w-fit rounded-2xl bg-white px-4 py-3 text-sm font-black text-green-800 shadow-sm">
               {coachPlan.nutrition}
             </span>
           </div>
@@ -112,7 +112,7 @@ export default function WeeklyPlanPage() {
 
         <div className="grid gap-4 lg:grid-cols-[1fr_1.25fr]">
           <Card className="bg-slate-950 text-white">
-            <Bot className="h-8 w-8 text-teal-300" />
+            <Bot className="h-8 w-8 text-green-300" />
             <h2 className="mt-3 text-xl font-black">Progression rules</h2>
             <p className="mt-2 text-sm font-medium leading-6 text-slate-300">
               Keep the plan simple enough to follow, then increase reps or quality gradually.

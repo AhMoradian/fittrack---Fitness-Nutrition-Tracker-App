@@ -37,7 +37,7 @@ export const NumberStepper = React.forwardRef<
   return (
     <div
       className={cn(
-        'flex min-h-12 min-w-0 max-w-full items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-teal-600',
+        'flex min-h-12 min-w-0 max-w-full items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-green-500',
         disabled && 'bg-slate-100 opacity-70',
         wrapperClassName,
       )}
