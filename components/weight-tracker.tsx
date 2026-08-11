@@ -41,7 +41,7 @@ export function WeightTracker({
   return (
     <Card>
       <div className="mb-5">
-        <Ruler className="h-7 w-7 text-green-600" />
+        <Ruler className="h-7 w-7 text-teal-700" />
         <h2 className="mt-2 text-xl font-black">Body metrics</h2>
         <p className="text-sm font-medium text-muted-foreground">Record measurements weekly under similar conditions.</p>
       </div>
@@ -53,7 +53,7 @@ export function WeightTracker({
             value={date}
             max={localDateKey()}
             onChange={(event) => setDate(event.target.value)}
-            className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600"
             required
           />
         </label>
@@ -83,7 +83,7 @@ export function WeightTracker({
         <Button className="w-full" type="submit">
           <Save className="h-5 w-5" /> Save measurements
         </Button>
-        {saved ? <p className="text-sm font-bold text-green-700">Measurements saved.</p> : null}
+        {saved ? <p className="text-sm font-bold text-teal-800">Measurements saved.</p> : null}
       </form>
     </Card>
   );

@@ -60,7 +60,7 @@ export function ProgressRing({ value, label, className }: { value: number; label
         className="grid h-28 w-28 place-items-center rounded-full shadow-inner"
         style={{
           '--progress-angle': `${clamped * 3.6}deg`,
-          background: 'conic-gradient(#22c55e var(--progress-angle), #e2e8f0 0deg)',
+          background: 'conic-gradient(#007173 var(--progress-angle), #e2e8f0 0deg)',
         } as React.CSSProperties}
       >
         <div className="grid h-20 w-20 place-items-center rounded-full bg-white">

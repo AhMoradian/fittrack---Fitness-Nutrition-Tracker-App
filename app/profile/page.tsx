@@ -82,11 +82,11 @@ export default function ProfilePage() {
         }
       />
       <section className="space-y-4 px-4 sm:px-5 md:px-8">
-        <Card className={userEmail ? 'border-green-200 bg-green-50' : undefined}>
+        <Card className={userEmail ? 'border-teal-200 bg-teal-50' : undefined}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
               {userEmail ? (
-                <Cloud className="mt-1 h-7 w-7 text-green-600" />
+                <Cloud className="mt-1 h-7 w-7 text-teal-700" />
               ) : (
                 <CloudOff className="mt-1 h-7 w-7 text-slate-500" />
               )}
@@ -119,9 +119,9 @@ export default function ProfilePage() {
 
         <Card className="bg-slate-950 text-white">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="grid h-20 w-20 place-items-center rounded-full bg-green-400 text-4xl">💪</div>
+            <div className="grid h-20 w-20 place-items-center rounded-full bg-teal-500 text-4xl">💪</div>
             <div>
-              <p className="text-sm font-black uppercase text-green-300">Home muscle building</p>
+              <p className="text-sm font-black uppercase text-teal-300">Home muscle building</p>
               <h2 className="text-2xl font-black">{data.profile.goal}</h2>
               <p className="text-sm font-bold text-slate-300">{data.profile.weekly_goal}</p>
             </div>
@@ -154,7 +154,7 @@ export default function ProfilePage() {
                   />
                 ) : (
                   <input
-                    className="w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500 disabled:bg-slate-100"
+                    className="w-full rounded-xl border bg-white px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600 disabled:bg-slate-100"
                     name={name}
                     type={type}
                     defaultValue={value}
@@ -166,15 +166,15 @@ export default function ProfilePage() {
             ))}
             <label className="sm:col-span-2">
               <span className="mb-2 block text-sm font-bold">Main goal</span>
-              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="goal" defaultValue={data.profile.goal} required />
+              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600" name="goal" defaultValue={data.profile.goal} required />
             </label>
             <label className="sm:col-span-2">
               <span className="mb-2 block text-sm font-bold">Weekly goal</span>
-              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="weeklyGoal" defaultValue={data.profile.weekly_goal} required />
+              <input className="w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600" name="weeklyGoal" defaultValue={data.profile.weekly_goal} required />
             </label>
             <label className="sm:col-span-2">
               <span className="mb-2 block text-sm font-bold">Equipment, separated by commas</span>
-              <textarea className="min-h-24 w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-green-500" name="equipment" defaultValue={data.profile.equipment.join(', ')} />
+              <textarea className="min-h-24 w-full rounded-xl border px-3 py-2 font-bold outline-none focus:ring-2 focus:ring-teal-600" name="equipment" defaultValue={data.profile.equipment.join(', ')} />
             </label>
             <Button className="sm:col-span-2"><Save className="h-5 w-5" /> Save profile</Button>
           </form>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
         </div>
 
         <Card>
-          <HardDrive className="h-7 w-7 text-green-600" />
+          <HardDrive className="h-7 w-7 text-teal-700" />
           <h2 className="mt-2 text-xl font-black">Your data</h2>
           <p className="mt-1 text-sm font-medium text-muted-foreground">
             {userEmail
@@ -212,7 +212,7 @@ export default function ProfilePage() {
               <input type="file" accept="application/json,.json" className="sr-only" onChange={handleImport} />
             </label>
           </div>
-          {message ? <p className="mt-3 text-sm font-bold text-green-700">{message}</p> : null}
+          {message ? <p className="mt-3 text-sm font-bold text-teal-800">{message}</p> : null}
         </Card>
       </section>
     </div>

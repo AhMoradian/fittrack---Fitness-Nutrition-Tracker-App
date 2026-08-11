@@ -81,7 +81,7 @@ export default function ProgressPage() {
           <Card className="p-4"><Flame className="h-6 w-6 text-orange-500" /><p className="mt-2 text-2xl font-black">{stats.current_streak}</p><p className="text-xs font-black uppercase text-muted-foreground">Current streak</p></Card>
           <Card className="p-4"><Trophy className="h-6 w-6 text-yellow-500" /><p className="mt-2 text-2xl font-black">{stats.best_streak}</p><p className="text-xs font-black uppercase text-muted-foreground">Best streak</p></Card>
           <Card className="p-4"><Zap className="h-6 w-6 text-yellow-500" /><p className="mt-2 text-2xl font-black">{stats.total_xp}</p><p className="text-xs font-black uppercase text-muted-foreground">Total XP</p></Card>
-          <Card className="p-4"><Award className="h-6 w-6 text-green-600" /><p className="mt-2 text-2xl font-black">{achievements.filter((achievement) => achievement.unlocked_at).length}</p><p className="text-xs font-black uppercase text-muted-foreground">Badges</p></Card>
+          <Card className="p-4"><Award className="h-6 w-6 text-teal-700" /><p className="mt-2 text-2xl font-black">{achievements.filter((achievement) => achievement.unlocked_at).length}</p><p className="text-xs font-black uppercase text-muted-foreground">Badges</p></Card>
         </div>
 
         <Card>
@@ -98,14 +98,14 @@ export default function ProgressPage() {
         <div className="grid gap-4 lg:grid-cols-2">
           <WeightTracker onSave={saveMetric} />
           <Card>
-            <Camera className="h-7 w-7 text-green-600" />
+            <Camera className="h-7 w-7 text-teal-700" />
             <h2 className="mt-2 text-xl font-black">Progress photos</h2>
             <p className="mt-1 text-sm font-medium text-muted-foreground">Photos are compressed and included in your private saved progress.</p>
-            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 font-black text-white">
+            <label className="mt-4 flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-teal-700 px-4 py-3 font-black text-white">
               <Upload className="h-5 w-5" /> Add today’s photo
               <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
             </label>
-            {photoMessage ? <p className="mt-2 text-sm font-bold text-green-700">{photoMessage}</p> : null}
+            {photoMessage ? <p className="mt-2 text-sm font-bold text-teal-800">{photoMessage}</p> : null}
             <div className="mt-4 grid grid-cols-2 gap-3">
               {data.progress_photos.map((photo) => (
                 <div key={photo.id} className="group relative overflow-hidden rounded-2xl bg-slate-100">

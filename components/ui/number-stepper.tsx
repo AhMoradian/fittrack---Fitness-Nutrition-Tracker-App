@@ -32,10 +32,12 @@ export const NumberStepper = React.forwardRef<
     onValueChange?.(input.value);
   };
 
+  const stepAmount = props.step ?? 1;
+
   return (
     <div
       className={cn(
-        'flex min-h-12 min-w-0 max-w-full items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-green-500',
+        'flex min-h-12 min-w-0 max-w-full items-center overflow-hidden rounded-xl border bg-white focus-within:ring-2 focus-within:ring-teal-600',
         disabled && 'bg-slate-100 opacity-70',
         wrapperClassName,
       )}
@@ -45,7 +47,7 @@ export const NumberStepper = React.forwardRef<
         onClick={() => changeByStep(-1)}
         disabled={disabled}
         className="grid h-12 w-12 shrink-0 touch-manipulation place-items-center border-r text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
-        aria-label={`Decrease ${props['aria-label'] ?? props.name ?? 'value'}`}
+        aria-label={`Decrease ${props['aria-label'] ?? props.name ?? 'value'} by ${stepAmount}`}
       >
         <Minus className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -69,7 +71,7 @@ export const NumberStepper = React.forwardRef<
         onClick={() => changeByStep(1)}
         disabled={disabled}
         className="grid h-12 w-12 shrink-0 touch-manipulation place-items-center border-l text-slate-600 transition hover:bg-slate-100 active:bg-slate-200 disabled:pointer-events-none"
-        aria-label={`Increase ${props['aria-label'] ?? props.name ?? 'value'}`}
+        aria-label={`Increase ${props['aria-label'] ?? props.name ?? 'value'} by ${stepAmount}`}
       >
         <Plus className="h-5 w-5" aria-hidden="true" />
       </button>

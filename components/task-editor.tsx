@@ -67,14 +67,14 @@ export function TaskEditor({
       </div>
       <form key={task?.id ?? 'new'} onSubmit={handleSubmit} className="mt-4 grid gap-3 md:grid-cols-6">
         <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500 md:col-span-2"
+          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600 md:col-span-2"
           name="title"
           placeholder="Task name"
           defaultValue={task?.title}
           required
         />
         <select
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600"
           name="category"
           defaultValue={task?.category ?? 'workout'}
         >
@@ -84,7 +84,7 @@ export function TaskEditor({
           <option value="habit">Habit</option>
         </select>
         <select
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600"
           name="dayIndex"
           defaultValue={String(task?.day_index ?? 1)}
           aria-label="Plan day"
@@ -103,7 +103,7 @@ export function TaskEditor({
           required
         />
         <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500"
+          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600"
           name="targetUnit"
           placeholder="Unit"
           defaultValue={task?.target_unit}
@@ -126,13 +126,13 @@ export function TaskEditor({
           aria-label="Number of workout sets"
         />
         <input
-          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500 md:col-span-2"
+          className="rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600 md:col-span-2"
           name="mealTime"
           placeholder="Meal time (optional)"
           defaultValue={task?.meal_time}
         />
         <textarea
-          className="min-h-24 rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-green-500 md:col-span-4"
+          className="min-h-24 rounded-2xl border bg-white px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-teal-600 md:col-span-4"
           name="description"
           placeholder="Exercise cues, meal details, or progression notes"
           defaultValue={task?.description}

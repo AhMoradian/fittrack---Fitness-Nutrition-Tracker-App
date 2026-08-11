@@ -65,14 +65,14 @@ export default function TodayPage() {
       ) : null}
 
       <section className="grid gap-4 px-4 sm:px-5 md:grid-cols-[1.1fr_1fr] md:px-8">
-        <Card className="confetti-bg overflow-hidden border-green-200 bg-green-50/90">
+        <Card className="confetti-bg overflow-hidden border-teal-200 bg-teal-50/90">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-black uppercase tracking-wider text-green-700">Daily Completion</p>
+              <p className="text-sm font-black uppercase tracking-wider text-teal-800">Daily Completion</p>
               <h2 className="mt-2 text-3xl font-black sm:text-4xl">
                 {summary.successful ? 'Successful day!' : 'Keep going!'}
               </h2>
-              <p className="mt-2 text-sm font-bold text-green-800">Reach 70% to keep your streak alive.</p>
+              <p className="mt-2 text-sm font-bold text-teal-900">Reach 70% to keep your streak alive.</p>
             </div>
             <ProgressRing value={summary.completion} label="done" />
           </div>
