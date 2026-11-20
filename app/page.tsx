@@ -46,6 +46,9 @@ export default function TodayPage() {
   const summary = getDailySummary(data.tasks, data.daily_logs, today);
   const stats = getUserStats(data.tasks, data.daily_logs, data.started_at, today);
   const planDay = planDayForDate(today);
+  const sessionTitle = data.coach_plan.days?.find(
+    (day) => day.day_index === planDay,
+  )?.title ?? `Plan Day ${planDay}: ${planDayNames[planDay]}`;
   const dateLabel = new Intl.DateTimeFormat(undefined, {
     weekday: 'long',
     month: 'long',
@@ -57,7 +60,7 @@ export default function TodayPage() {
       <ScreenHeader
         eyebrow={dateLabel}
         title="Win the day"
-        subtitle={`Plan Day ${planDay}: ${planDayNames[planDay]}. ${userEmail ? 'Your progress is synced across your devices.' : 'Your progress is private and saved on this device.'}`}
+        subtitle={`${sessionTitle}. ${userEmail ? 'Your progress is synced across your devices.' : 'Your progress is private and saved on this device.'}`}
       />
 
       {!ready ? (

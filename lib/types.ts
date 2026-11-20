@@ -117,6 +117,8 @@ export type CoachPlanDetails = {
   phase: string;
   focus: string;
   nutrition: string;
+  days?: { day_index: number; title: string; description: string }[];
+  rules?: string[];
 };
 
 export type CoachPlanSnapshot = CoachPlanDetails & {
