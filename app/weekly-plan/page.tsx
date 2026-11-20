@@ -69,7 +69,9 @@ export default function WeeklyPlanPage() {
   const { data, saveTask, deleteTask } = useFitTrack();
   const coachPlan = data.coach_plan;
   const [editingTask, setEditingTask] = useState<Task>();
-  const days = Array.from({ length: 7 }, (_, index) => index + 1);
+  const days = coachPlan.days?.length
+    ? coachPlan.days.map((day) => day.day_index)
+    : Array.from({ length: 7 }, (_, index) => index + 1);
   const dailyTasks = data.tasks
     .filter((task) => task.category !== 'workout')
     .sort((a, b) => a.sort_order - b.sort_order);
@@ -105,7 +107,7 @@ export default function WeeklyPlanPage() {
             </span>
           </div>
           <p className="mt-3 text-xs font-bold text-muted-foreground">
-            Your Sunday coach review can publish a new version automatically.
+            Review this plan with your coach whenever you want to adapt it.
             Older plans, logs, measurements, check-ins, and custom tasks stay intact.
           </p>
         </Card>
@@ -118,7 +120,7 @@ export default function WeeklyPlanPage() {
               Keep the plan simple enough to follow, then increase reps or quality gradually.
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-              {programRules.map((rule) => (
+              {(coachPlan.rules ?? programRules).map((rule) => (
                 <span key={rule} className="rounded-2xl bg-white/10 px-3 py-2 text-sm font-bold">{rule}</span>
               ))}
             </div>
@@ -153,14 +155,15 @@ export default function WeeklyPlanPage() {
 
         <div className="grid gap-4 xl:grid-cols-2">
           {days.map((day) => {
+            const session = coachPlan.days?.find((entry) => entry.day_index === day);
             const dayTasks = data.tasks
               .filter((task) => task.day_index === day && task.category === 'workout')
               .sort((a, b) => a.sort_order - b.sort_order);
             return (
               <Card key={day} className="space-y-3">
                 <div>
-                  <h2 className="text-lg font-black">{dayNames[day]}</h2>
-                  <p className="mt-1 text-sm font-bold text-muted-foreground">{dayNotes[day]}</p>
+                  <h2 className="text-lg font-black">{session?.title ?? dayNames[day]}</h2>
+                  <p className="mt-1 text-sm font-bold text-muted-foreground">{session?.description ?? dayNotes[day]}</p>
                 </div>
                 {dayTasks.length ? (
                   dayTasks.map((task) => (
