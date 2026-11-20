@@ -164,7 +164,10 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    let startupTimedOut = false;
     let channel: RealtimeChannel | undefined;
+    let startupTimeout: ReturnType<typeof setTimeout> | undefined;
+    const startupAbort = new AbortController();
 
     const loadLocalData = () => {
       try {
@@ -192,13 +195,26 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // Cloud authentication may retry for minutes. Keep local tracking available,
+      // and never let a late response overwrite edits made after falling back.
+      startupTimeout = setTimeout(() => {
+        if (!active) return;
+        startupTimedOut = true;
+        startupAbort.abort();
+        userIdRef.current = null;
+        setUserEmail(null);
+        setData(localData);
+        setSyncStatus('error');
+        setReady(true);
+      }, 4000);
+
       try {
         const supabase = createClient();
         const {
           data: { user },
         } = await supabase.auth.getUser();
 
-        if (!active) return;
+        if (!active || startupTimedOut) return;
         if (!user) {
           setData(localData);
           setSyncStatus('local');
@@ -206,17 +222,15 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        userIdRef.current = user.id;
-        setUserEmail(user.email ?? null);
-
         const { data: cloudRow, error } = await supabase
           .from(CLOUD_TABLE)
           .select('data, updated_at')
           .eq('user_id', user.id)
+          .abortSignal(startupAbort.signal)
           .maybeSingle();
 
         if (error) throw error;
-        if (!active) return;
+        if (!active || startupTimedOut) return;
 
         if (
           cloudRow?.data &&
@@ -227,15 +241,17 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
           setData(normalizeData(cloudRow.data as FitTrackData));
         } else {
           const updatedAt = new Date().toISOString();
-          const { error: saveError } = await supabase.from(CLOUD_TABLE).upsert({
-            user_id: user.id,
-            data: localData,
-            updated_at: updatedAt,
-          });
+          const { error: saveError } = await supabase.from(CLOUD_TABLE)
+            .upsert({ user_id: user.id, data: localData, updated_at: updatedAt })
+            .abortSignal(startupAbort.signal);
           if (saveError) throw saveError;
+          if (!active || startupTimedOut) return;
           cloudUpdatedAtRef.current = updatedAt;
           setData(localData);
         }
+
+        userIdRef.current = user.id;
+        setUserEmail(user.email ?? null);
 
         channel = supabase
           .channel(`fittrack-sync-${user.id}`)
@@ -271,11 +287,14 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
         setSyncStatus('synced');
       } catch (error) {
         console.error('Could not sync FitTrack data with Supabase.', error);
-        if (!active) return;
+        if (!active || startupTimedOut) return;
+        userIdRef.current = null;
+        setUserEmail(null);
         setData(localData);
         setSyncStatus('error');
       } finally {
-        if (active) setReady(true);
+        clearTimeout(startupTimeout);
+        if (active && !startupTimedOut) setReady(true);
       }
     };
 
@@ -283,6 +302,8 @@ export function FitTrackProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       active = false;
+      clearTimeout(startupTimeout);
+      startupAbort.abort();
       if (channel) void channel.unsubscribe();
     };
   }, []);
